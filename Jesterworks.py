@@ -4,118 +4,100 @@ import ROOT
 import os, sys, configparser
 from tqdm import tqdm
 from array import array
-from EventManager import EventManager
 class Jesterworks():
     def __init__(self,ConfigFileName = ""):
         self.Configuration = configparser.ConfigParser()
-        self.Configuration.read(ConfigFileName)        
-        self.TheEventManager = EventManager()
-        self.CancelationList = []
+        self.Configuration.read(ConfigFileName)                        
         self.RenameDictionary = {}
         self.Path = ""
-        self.File = ""
-        self.CutDictionary = {}
-        self.PriorityScheme = ""
-        self.FirstLoadedFile = True
+        self.OutTreeName = ""
+        self.InputFiles = []        
+        self.CutList = []        
+        self.FirstLoadedFile = True        
         self.pileup_mc = ROOT.TH1F("pileup_mc","pileup_mc", 80, 0.0, 80.0)
     
-    def ProcessConfiguration(self,Configuration):
+    def ProcessConfiguration(self):        
         for Token in self.Configuration:
             for Element in self.Configuration[Token]:                
-                if(Token == "rename"):
-                    if(self.Configuration[Token][Element] == "cancel"):
-                        self.CancelationList.append(Element)
-                    else:
-                        self.RenameDictionary[Element] = self.Configuration[Token][Element]
-                if(Token == "cuts"):
-                    self.CutDictionary[Element] = self.Configuration[Token][Element]
-                if(Token == "output"):
+                #print("Token: "+Token)
+                #print("Element: "+Element)
+                #print("Value: "+self.Configuration[Token][Element])
+                #print()
+                if(Token == "RENAME"):                   
+                    self.RenameDictionary[Element] = self.Configuration[Token][Element]
+
+                if(Token == "CUTS"):
+                    self.CutList.append(self.Configuration[Token][Element])
+                
+                if(Token == "OUTPUT"):
                     if(Element == "tree"):
-                        self.OutTree = ROOT.TTree(self.Configuration[Token][Element],self.Configuration[Token][Element])
+                        self.OutTreeName = self.Configuration[Token][Element]
                     if(Element == "file"):
                         self.OutFile = ROOT.TFile(self.Configuration[Token][Element],"RECREATE");
-                if(Token == "input"):
+                
+                if(Token == "INPUT"):
                     if(Element == "chain"):
+                        #print("Making a chain! Yay!")
                         self.InputChain = ROOT.TChain(self.Configuration[Token][Element],self.Configuration[Token][Element])
                     if(Element == "path"):
                         self.Path = self.Configuration[Token][Element]
-                    if(Element == "file"):
-                        self.InputChain.Add(self.Path+"/"+self.Configuration[Token][Element])
-                        HistoFile = ROOT.TFile(self.Path+"/"+self.Configuration[Token][Element],"READ")
-                        if(FirstLoadedFile):
-                            self.EventCounter = HistoFile.Get("mt/eventCount").Clone()
-                            self.EventCounterWeights = HistoFile.Get("mt/summedWeights").Clone()
-                            FirstLoadedFile = False
+                    if(Element == "numfiles"):
+                        if (self.Configuration[Token][Element] == "all" or self.Configuration[Token][Element] == "0"):
+                            for Filename in os.listdir(self.Path):
+                                self.InputChain.Add(self.Path+"/"+Filename)
+                                HistoFile = ROOT.TFile(self.Path+"/"+Filename,"READ")
+                                if(FirstLoadedFile):
+                                    self.EventCounter = HistoFile.Get("mt/eventCount").Clone()
+                                    self.EventCounterWeights = HistoFile.Get("mt/summedWeights").Clone()
+                                    self.FirstLoadedFile = False
+                                else:
+                                    NewHistoFile = ROOT.TFile(self.Path+"/"+Filename,"READ")
+                                    self.EventCounter.Add(NewHistoFile.Get("mt/eventCount").Clone())
+                                    self.EventCounterWeights.Add(NewHistoFile.Get("mt/summedWeights").Clone())
+                                    NewHistoFile.Close()
                         else:
-                            self.EventCounter.Add(HistoFile.Get("mt/eventCount").Clone())
-                            self.EventCounterWeights.Add(HistoFile.Get("mt/summedWeights").Clone())
-                if(Token == "priority"):
-                    self.PriortyScheme = self.Configuration[Token][Element]
-        print("Done Processing Configuration...")
+                            for Filename in os.listdir(self.Path)[:int(self.Configuration[Token][Element])]:
+                                self.InputChain.Add(self.Path+"/"+Filename)
+                                HistoFile = ROOT.TFile(self.Path+"/"+Filename,"READ")                          
+                                if(self.FirstLoadedFile):                                    
+                                    self.EventCounter = HistoFile.Get("mt/eventCount").Clone()
+                                    self.EventCounterWeights = HistoFile.Get("mt/summedWeights").Clone()
+                                    self.EventCounter.SetDirectory(0) #Don't lose the histograms when file closes
+                                    self.EventCounterWeights.SetDirectory(0)
+                                    HistoFile.Close()
+                                    self.FirstLoadedFile = False
+                                else:                                    
+                                    self.EventCounter.Add(HistoFile.Get("mt/eventCount").Clone())
+                                    self.EventCounterWeights.Add(HistoFile.Get("mt/summedWeights").Clone())
+                                    HistoFile.Close()
+        print("Done Processing Configuration...")        
 
-        def PrepEventManager(self):
-            self.TheEventManager.GetInputBranchNameList() = self.InputChain.GetListOfBranches()
-            #let's handle the cancelations right here
-            for Name in self.CancelationList:
-                self.TheEventManager.GetInputBranchNameList().remove(Name)
-            #construct the output branches and the translation between input and output in one go
-            for Name in self.TheEventManager.GetInputBranchNameList():
-                if(self.RenameDictionary[Name] != None):
-                    self.TheEventManager.GetInputBranchNameList().append(RenameDictionary[Name])
-                    self.TheEventManager.GetTranslationDictionary()[Name] = RenameDictionary[Name]
+    def PerformSkim(self):        
+        print("Processing Skim...")
+        TempTree = self.InputChain.CopyTree("")        
+        for i in tqdm(range(len(self.CutList))):
+            TempTree = TempTree.CopyTree(self.CutList[i])
+        self.OutTree = TempTree        
+        self.OutTree.SetNameTitle(self.OutTreeName,self.OutTreeName)
+        for Branch in self.OutTree.GetListOfBranches():
+            #print(Branch)
+            if(Branch.GetName() in self.RenameDictionary.keys()):
+                if (self.RenameDictionary[Branch.GetName()] == "cancel"):
+                    Branch.SetStatus(0)
                 else:
-                    self.TheEventManager.GetInputBranchNameList().append(Name)
-                    self.TheEventManager.GetTranslationDictionary()[Name] = [Name]
-            self.TheEventManager.AttachInputChainToVariables(self.InputChain)
-            self.TheEventManager.AttachOutputTreeToVariables(self.OutTree)
-            self.TheEventManager.GetTheCutDictionary() = CutDictionary
+                    Branch.SetNameTitle(self.RenameDictionary[Branch.GetName()])                    
+        #should be done now?
 
-        def PerformSkim(self):
-            print("Processing Skim...")
-            for i in tqdm(range(self.InputChain.GetEntries())):
-                self.InputChain.GetEntry(i)
-                self.pileup_mc.Fill(self.TheEventManager.GetInputManager().GetInputDictionary["nTruePU"])
-                
-                if(not self.TheEventManager.IsGoodEvent()) continue
-                #translate the input to output.
-                self.TheEventManager.TranslateInputToOutput()
-
-                #handle the staging
-                #first event. Move current up to staged
-                if(i == 0):
-                    self.TheEventManager.GetTheOutputManager().GetStagedOutputDictionary() = self.TheEventManager.GetTheOutputManager().GetCurrentOutputDictionary()
-                #duplicate event. Decide what to do about that.
-                else if(self.TheEventManager.GetTheOutputManager().GetCurrentOutputDictionary()["evt"] == self.TheEventManager.GetTheOutputManager().GetStagedOutputDictionary["evt"]):
-                    #TODO: Implement more complete priority scheme, for now this will do
-                    #if the new pt_1 is greater, move the current up to staged
-                    # or if the new pt_1 is greater than the old pt_1 minus a bit and the 
-                    #pt_2 is greater than the old
-                    #move the urrent 
-                    if(self.PrioritySceme == "normal"):
-                        if(self.EventManager.GetTheOutputManager().GetCurrentOutputDictionary["pt_1"] > self.EventManager.GetTheOutputManager.GetStagedOutputDictionary["pt_1"]):
-                            self.TheEventManager.GetTheOutputManager().GetStagedOutputDictionary() = self.TheEventManager.GetTheOutputManager().GetCurrentOutputDictionary()
-                        
-                        if(self.EventManager.GetTheOutputManager().GetCurrentOutputDictionary["pt_1"] > self.EventManager.GetTheOutputManager.GetStagedOutputDictionary["pt_1"] - 0.00001
-                           and self.EventManager.GetTheOutputManager().GetCurrentOutputDictionary["pt_2"] > self.EventManager.GetTheOutputManager.GetStagedOutputDictionary["pt_2"]):
-                            self.TheEventManager.GetTheOutputManager().GetStagedOutputDictionary() = self.TheEventManager.GetTheOutputManager().GetCurrentOutputDictionary()
-                #no similar event to compare to.
-                #fill the staged event and move the current up to staged
-                else:
-                    self.OutTree.Fill()
-                    self.TheEventManager.GetTheOutputManager().GetStagedOutputDictionary() = self.TheEventManager.GetTheOutputManager().GetCurrentOutputDictionary()
-            #fill the last event we have staged
-            self.OutTree.Fill()
-
-        def WrapUpAndLeave(self):
-            self.OutFile.cd()
-            self.OutTree.Write()
-            self.EventCounter.Write()
-            self.EventCounterWeights.Write()
-            self.pileup_mc.Write()
-            self.OutFile.Close()
+    def WrapUpAndLeave(self):
+        self.OutFile.cd()
+        self.OutTree.Write()
+        self.EventCounter.Write()
+        self.EventCounterWeights.Write()
+        self.pileup_mc.Write()
+        self.OutFile.Close()
             
 if __name__ == "__main__":
     JesterworksImplementation = Jesterworks(sys.argv[1])
-    JesterworksImplementation.ProcessConfiguration()
-    JesterworksImplementation.PrepEventManager()
+    JesterworksImplementation.ProcessConfiguration()    
     JesterworksImplementation.PerformSkim()
+    JesterworksImplementation.WrapUpAndLeave()
