@@ -7,6 +7,7 @@ import Queue
 from tqdm import tqdm
 from array import array
 
+threadLock = threading.Lock()
 queueLock = threading.Lock()
 WorkQueue = Queue.Queue()
 IDQueue = Queue.Queue()
@@ -121,12 +122,16 @@ class Jesterworks():
                 InputChain.SetDirectory(0)        
 
         #perform the skim now.        
-                TempTree = InputChain.CopyTree("")        
+                TempTree = InputChain.CopyTree("")   
+                CompleteCut = ""
                 for Cut in TheCuts:
-                    TempTree = TempTree.CopyTree(Cut)
-                OutTree = TempTree
+                    #TempTree = TempTree.CopyTree(Cut)
+                    CompleteCut+=("("+Cut+")&&")
+                CompleteCut=CompleteCut[:len(CompleteCut)-2]
+                #print(CompleteCut)
+                OutTree = TempTree.CopyTree(CompleteCut)
                 OutTree.SetNameTitle(OutTreeName,OutTreeName)
-
+                
         #perform any renaming        
                 for Branch in OutTree.GetListOfBranches():            
                     if(Branch.GetName() in RenameDictionary.keys()):
@@ -168,7 +173,8 @@ class Jesterworks():
             WorkQueue.put(File)
             IDQueue.put(Processed)
         queueLock.release()
-        
+
+        threadLock.acquire()
         for i in range(self.NumThreads):
             TheThread = SkimThread(i, self.PerformSkim,IDQueue,
                                    self.OutTreeName,self.OutFileName,
@@ -176,6 +182,7 @@ class Jesterworks():
                                    self.CutList,self.RenameDictionary)
             TheThread.start()
             self.Threads.append(TheThread)
+        threadLock.release()
         
         for i in tqdm(range(len(self.Threads))):
             self.Threads[i].join()
