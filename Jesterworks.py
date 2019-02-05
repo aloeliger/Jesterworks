@@ -70,6 +70,7 @@ class Jesterworks():
         self.InputChainName = ""
         self.Channel = ""
         self.NumFilesToProcess = ""
+        self.GrabHistos = True
         self.InputFiles = []
         self.PathList = []                
         self.SkimEvalFunction = SkimFunctionDefinition
@@ -85,6 +86,9 @@ class Jesterworks():
                     if(Element == "file"):
                         self.OutFileName = str(self.Configuration[Token][Element])
                         print("OutFileName: "+self.OutFileName)
+                    if(Element == "grabhistos"):
+                        self.GrabHistos = bool(self.Configuration[Token][Element])
+                        print("GrabHistos: "+str(GrabHistos))
 
                 if(Token == "INPUT"):
                     if(Element == "chain"):
@@ -192,23 +196,24 @@ class Jesterworks():
         OutputTree.Fill()
 
         #grab the important histogram that come along with
-        print("\tCreating Meta Histograms...")
-        InitialFile = ROOT.TFile(self.InputFiles[0],"READ")
-        EventCounter = InitialFile.Get(self.Channel+"/eventCount").Clone()
-        EventCounter.SetDirectory(0)
-        EventCounterWeights = InitialFile.Get(self.Channel+"/summedWeights").Clone()
-        EventCounterWeights.SetDirectory(0)
-        OutputFile.cd()
-        InitialFile.Close()        
-        for i in range(1,len(self.InputFiles)):
-            TheFile = ROOT.TFile(self.InputFiles[i],"READ")
-            EventCounter.Add(TheFile.Get(self.Channel+"/eventCount"))
-            EventCounterWeights.Add(TheFile.Get(self.Channel+"/summedWeights"))
-            TheFile.Close()
+        if(self.GrabHistos):
+            print("\tCreating Meta Histograms...")
+            InitialFile = ROOT.TFile(self.InputFiles[0],"READ")
+            EventCounter = InitialFile.Get(self.Channel+"/eventCount").Clone()
+            EventCounter.SetDirectory(0)
+            EventCounterWeights = InitialFile.Get(self.Channel+"/summedWeights").Clone()
+            EventCounterWeights.SetDirectory(0)
+            OutputFile.cd()
+            InitialFile.Close()        
+            for i in range(1,len(self.InputFiles)):
+                TheFile = ROOT.TFile(self.InputFiles[i],"READ")
+                EventCounter.Add(TheFile.Get(self.Channel+"/eventCount"))
+                EventCounterWeights.Add(TheFile.Get(self.Channel+"/summedWeights"))
+                TheFile.Close()
             
-        pileup_mc = ROOT.TH1F("pileup_mc","pileup_mc",80,0,80)
-        for Event in InputChain:
-            pileup_mc.Fill(InputChain.nTruePU)
+                pileup_mc = ROOT.TH1F("pileup_mc","pileup_mc",80,0,80)
+                for Event in InputChain:
+                    pileup_mc.Fill(InputChain.nTruePU)
         #Post skim
         print("\tWriting To File... ")
         OutputFile.cd()
