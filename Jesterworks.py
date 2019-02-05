@@ -7,6 +7,7 @@
 # then it creats an instance, gives it these functions, and runs it.
 import ROOT
 import os, sys, configparser
+import glob
 from tqdm import tqdm
 from array import array
 
@@ -88,8 +89,11 @@ class Jesterworks():
                         self.OutFileName = str(self.Configuration[Token][Element])
                         print("OutFileName: "+self.OutFileName)
                     if(Element == "grabhistos"):
-                        self.GrabHistos = bool(self.Configuration[Token][Element])
-                        print("GrabHistos: "+str(GrabHistos))
+                        if self.Configuration[Token][Element] == "False":
+                            self.GrabHistos = False
+                        elif self.Configuration[Token][Element] == "True":
+                            self.GrabHistos = True
+                        print("GrabHistos: "+str(self.GrabHistos))
 
                 if(Token == "INPUT"):
                     if(Element == "chain"):
@@ -107,7 +111,7 @@ class Jesterworks():
                         print("Channel: "+self.Channel)
                     if(Element == "sample"):
                         self.SampleName = str(self.Configuration[Token][Element])
-                        print("SampleName: "+SampleName)
+                        print("SampleName: "+self.SampleName)                
         print("Done Processing Configuration")
         
     #Just generates a list of file paths that we can use later to hook trees
@@ -116,14 +120,22 @@ class Jesterworks():
         print("Generating List of Files To Run On...")
         if (self.NumFilesToProcess == "all" or self.NumFilesToProcess == "0"):
             for Path in self.PathList:
-                for Filename in os.listdir(Path):
+                for Filename in glob.glob(Path):
+                    if Path.find('.') != -1:
+                        #our path already contains a filename,
+                        #no need to get a filename in this path
+                        Filename = ''
                     self.InputFiles.append(Path+Filename)
         else:            
             NumFilesGrabbed = 0
             for Path in self.PathList:                                
                 if (NumFilesGrabbed == int(self.NumFilesToProcess)):
                     break                
-                for Filename in os.listdir(Path):                    
+                for Filename in glob.glob(Path):
+                    if Path.find('.') != -1:
+                        #our path already contains a filename,
+                        #no need to get a filename in this path
+                        Filename = ''
                     self.InputFiles.append(Path+Filename)
                     NumFilesGrabbed += 1
                     if (NumFilesGrabbed == int(self.NumFilesToProcess)):
@@ -137,7 +149,11 @@ class Jesterworks():
         OutputFile = ROOT.TFile(self.OutFileName+".root","RECREATE")
 
         print("\tSetting Up Input Chain...")
-        InputChain = ROOT.TChain(self.Channel+"/"+self.InputChainName)
+        AdditionalSlash = "/"
+        if self.Channel == "":
+            #no need to prepend a slash
+            AdditionalSlash = ""
+        InputChain = ROOT.TChain(self.Channel+AdditionalSlash+self.InputChainName)
         for FileName in self.InputFiles:            
             InputChain.Add(FileName)            
 
@@ -203,16 +219,16 @@ class Jesterworks():
         if(self.GrabHistos):
             print("\tCreating Meta Histograms...")
             InitialFile = ROOT.TFile(self.InputFiles[0],"READ")
-            EventCounter = InitialFile.Get(self.Channel+"/eventCount").Clone()
+            EventCounter = InitialFile.Get(self.Channel+AdditionalSlash+"eventCount").Clone()
             EventCounter.SetDirectory(0)
-            EventCounterWeights = InitialFile.Get(self.Channel+"/summedWeights").Clone()
+            EventCounterWeights = InitialFile.Get(self.Channel+AdditionalSlash+"summedWeights").Clone()
             EventCounterWeights.SetDirectory(0)
             OutputFile.cd()
             InitialFile.Close()        
             for i in range(1,len(self.InputFiles)):
                 TheFile = ROOT.TFile(self.InputFiles[i],"READ")
-                EventCounter.Add(TheFile.Get(self.Channel+"/eventCount"))
-                EventCounterWeights.Add(TheFile.Get(self.Channel+"/summedWeights"))
+                EventCounter.Add(TheFile.Get(self.Channel+AdditionalSlash+"eventCount"))
+                EventCounterWeights.Add(TheFile.Get(self.Channel+AdditionalSlash+"summedWeights"))
                 TheFile.Close()
             
                 pileup_mc = ROOT.TH1F("pileup_mc","pileup_mc",80,0,80)
