@@ -1,7 +1,7 @@
 import ROOT
 from Jesterworks import Jesterworks
 
-def TestSkim(TheEvent):
+def TestSkim(TheEvent,SampleName=""):
     TauVector = ROOT.TLorentzVector()
     MuVector = ROOT.TLorentzVector()
     TauVector.SetPtEtaPhiM(TheEvent.tPt,TheEvent.tEta,TheEvent.tPhi,TheEvent.tMass)
