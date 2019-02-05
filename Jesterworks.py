@@ -1,7 +1,7 @@
 #Andrew Loeliger
 #Skim code. 
 #Requires outside input of a configuration file, and a small dedicated
-#.py file that defines what a good event is off of the chain, 
+#.py file that defines what a good event is off of the chain, and takes a sample name
 # then it defines a function that defines which events to prioritize in case
 # of duplicates
 # then it creats an instance, gives it these functions, and runs it.
@@ -14,7 +14,7 @@ from array import array
 #default version of a skim function. Tells you what to actually do
 def DefaultSkimFunction(TheEvent):
     print("Proper Skim function not defined! Defaulting to rejecting all events!")
-    print("Please define a skim function that takes one argument: The Chain (with current values grabbed)")
+    print("Please define a skim function that takes two argument: The Chain (with current values grabbed) and a sample name.")
     print("As well as a main function that creates a Jesterworks instance, and gives it a proper configuration and this function.")
     return False
 
@@ -65,6 +65,7 @@ class Jesterworks():
                  SkimFunctionDefinition=DefaultSkimFunction,
                  PriorityFunctionDefinition=DefaultPriorityFunction):
         self.Configuration = configparser.ConfigParser()
+        self.Configuration.optionxform = str
         self.Configuration.read(ConfigFileName)
         self.OutTreeName = ""
         self.OutFileName = ""
@@ -73,6 +74,7 @@ class Jesterworks():
         self.NumFilesToProcess = ""
         self.SampleName = ""
         self.GrabHistos = True
+        self.RenameDictionary = {}
         self.InputFiles = []
         self.PathList = []                
         self.SkimEvalFunction = SkimFunctionDefinition
@@ -111,7 +113,10 @@ class Jesterworks():
                         print("Channel: "+self.Channel)
                     if(Element == "sample"):
                         self.SampleName = str(self.Configuration[Token][Element])
-                        print("SampleName: "+self.SampleName)                
+                        print("SampleName: "+self.SampleName)
+                        
+                if(Token == "RENAME"):
+                    self.RenameDictionary[Element] = str(self.Configuration[Token][Element])
         print("Done Processing Configuration")
         
     #Just generates a list of file paths that we can use later to hook trees
@@ -120,23 +125,15 @@ class Jesterworks():
         print("Generating List of Files To Run On...")
         if (self.NumFilesToProcess == "all" or self.NumFilesToProcess == "0"):
             for Path in self.PathList:
-                for Filename in glob.glob(Path):
-                    if Path.find('.') != -1:
-                        #our path already contains a filename,
-                        #no need to get a filename in this path
-                        Filename = ''
-                    self.InputFiles.append(Path+Filename)
+                for Filename in glob.glob(Path+"*"):                    
+                    self.InputFiles.append(Filename)
         else:            
             NumFilesGrabbed = 0
             for Path in self.PathList:                                
                 if (NumFilesGrabbed == int(self.NumFilesToProcess)):
                     break                
-                for Filename in glob.glob(Path):
-                    if Path.find('.') != -1:
-                        #our path already contains a filename,
-                        #no need to get a filename in this path
-                        Filename = ''
-                    self.InputFiles.append(Path+Filename)
+                for Filename in glob.glob(Path+"*"):
+                    self.InputFiles.append(Filename)
                     NumFilesGrabbed += 1
                     if (NumFilesGrabbed == int(self.NumFilesToProcess)):
                         break
@@ -235,6 +232,10 @@ class Jesterworks():
                 for Event in InputChain:
                     pileup_mc.Fill(InputChain.nTruePU)
         #Post skim
+        print("\tPerforming Renaming...")
+        for key in self.RenameDictionary:            
+            OutputTree.GetBranch(key).SetNameTitle(self.RenameDictionary[key],self.RenameDictionary[key])
+
         print("\tWriting To File... ")
         OutputFile.cd()
         OutputTree.Write()
@@ -246,4 +247,4 @@ class Jesterworks():
         print("Done Performing Skim...")
 
 if __name__ == "__main__":
-    print("Can't call this file. Please create a specific file with a skimming function(takes a chain with values ready to go as an argument, returns true if this event is to be accepted, and false otherwise), a priority function (takes two dictionaries with branch name keys, returns true to keep the new event, false otherwise) and a main that creates a tau skim instance, and gives it both a configuration file, and these functions.")
+    print("Can't call this file. Please create a specific file with a skimming function(takes a chain with values ready to go as an argument and a sample name, returns true if this event is to be accepted, and false otherwise), a priority function (takes two dictionaries with branch name keys, returns true to keep the new event, false otherwise) and a main that creates a tau skim instance, and gives it both a configuration file, and these functions.")
