@@ -70,6 +70,7 @@ class Jesterworks():
         self.InputChainName = ""
         self.Channel = ""
         self.NumFilesToProcess = ""
+        self.SampleName = ""
         self.GrabHistos = True
         self.InputFiles = []
         self.PathList = []                
@@ -104,6 +105,9 @@ class Jesterworks():
                     if(Element == "channel"):
                         self.Channel = str(self.Configuration[Token][Element])
                         print("Channel: "+self.Channel)
+                    if(Element == "sample"):
+                        self.SampleName = str(self.Configuration[Token][Element])
+                        print("SampleName: "+SampleName)
         print("Done Processing Configuration")
         
     #Just generates a list of file paths that we can use later to hook trees
@@ -160,7 +164,7 @@ class Jesterworks():
         for i in tqdm(range(InputChain.GetEntries())):
             #print("\t\tGetting intial event...")
             InputChain.GetEntry(i)
-            if self.SkimEvalFunction(InputChain):                
+            if self.SkimEvalFunction(InputChain,self.SampleName):                
                 #print("\t\t\tFound good event...")
                 #duplicate prevention
                 if(GetRLECode(InputChain) == PreferedRLE):
