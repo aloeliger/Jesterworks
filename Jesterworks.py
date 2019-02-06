@@ -33,30 +33,6 @@ def DefaultPriorityFunction(NewEventDictionary,OldEventDictrionary):
 def GetRLECode(TheEvent):
     return str(TheEvent.run)+":"+str(TheEvent.lumi)+":"+str(TheEvent.evt)
 
-#takes the chain creates dictionaries for all available branches
-def GenerateEventDictionaries(TheChain,NewEntry,OldEntry):
-    #we're going to ignore the RLE branches because we already know they match
-    #atm we're going to assume all other branches are bound in floats.
-    #.. because I don't know how to handle it otherwise    
-    EventValues = {}
-    NewEventDictionary = {}
-    OldEventDictionary = {}    
-    for Branch in TheChain.GetListOfBranches():        
-        if(Branch.GetName() != "run"
-           and Branch.GetName() != "lumi"
-           and Branch.GetName() != "evt"):            
-            EventValues[Branch.GetName()]=array('f',[0.])            
-            Branch.SetAddress(EventValues[Branch.GetName()])                        
-    TheChain.GetEntry(NewEntry)    
-    for key in EventValues:                
-        NewEventDictionary[key] = EventValues[key][0]
-    TheChain.GetEntry(OldEntry)
-    for key in EventValues:
-        OldEventDictionary[key] = EventValues[key][0]        
-    TheChain.GetEntry(NewEntry)
-    return NewEventDictionary,OldEventDictionary
-    
-
 class Jesterworks():
     #takes a configuration, a skimming function, and a priority function
     #The skim function will be used later to decide if an event passes,
@@ -76,7 +52,9 @@ class Jesterworks():
         self.GrabHistos = True
         self.RenameDictionary = {}
         self.InputFiles = []
-        self.PathList = []                
+        self.PathList = []    
+        self.PerformPreCuts = False
+        self.PreCutList = []
         self.SkimEvalFunction = SkimFunctionDefinition
         self.PriorityEvalFunction = PriorityFunctionDefinition
 
@@ -117,6 +95,10 @@ class Jesterworks():
                         
                 if(Token == "RENAME"):
                     self.RenameDictionary[Element] = str(self.Configuration[Token][Element])
+                
+                if(Token == "PRECUTS"):
+                    self.PerformPreCuts = True
+                    self.PreCutList.append(str(self.Configuration[Token][Element]))
         print("Done Processing Configuration")
         
     #Just generates a list of file paths that we can use later to hook trees
@@ -157,6 +139,14 @@ class Jesterworks():
         print("\tSetting Up Output Tree...")            
         OutputTree=InputChain.CloneTree(0)
         OutputTree.SetNameTitle(self.OutTreeName,self.OutTreeName)
+
+        if(self.PerformPreCuts):
+            print("\tPerforming precutting...")
+            CompleteCut = ""
+            for Cut in self.PreCutList:
+                CompleteCut+=("("+Cut+")&&")
+            CompleteCut=CompleteCut[:len(CompleteCut)-2]
+            InputChain = InputChain.CopyTree(CompleteCut)
         
         print("\tSetting up the event dictionaries...")
         EventValues = {}
@@ -174,37 +164,42 @@ class Jesterworks():
         #via passed function.
         PreferedEntry=0
         PreferedRLE=''
+        FirstAcceptedEvent = True
         for i in tqdm(range(InputChain.GetEntries())):
             #print("\t\tGetting intial event...")
-            InputChain.GetEntry(i)
+            InputChain.GetEntry(i)            
             if self.SkimEvalFunction(InputChain,self.SampleName):                
                 #print("\t\t\tFound good event...")
-                #duplicate prevention
-                if(GetRLECode(InputChain) == PreferedRLE):
-                    #print("\t\t\t\tDuplicate event...")                    
-                    #Fill both event dictionaries, and hand it over.
-                    for key in EventValues:
-                        NewEventDictionary[key] = EventValues[key][0]
-                    InputChain.GetEntry(PreferedEntry)
-                    for key in EventValues:
-                        OldEventDictionary[key] = EventValues[key][0] 
-                    InputChain.GetEntry(i)
-                    
+                #Good event. Automatically fill The new event dictionary.
+                for key in EventValues:
+                    NewEventDictionary[key] = EventValues[key][0]
+                #if it's the first event, automatically dump this to the prefered event dictionary and continue
+                if(FirstAcceptedEvent):
+                    #print("\t\t\t\tFirst accepted event, making it prefered and moving on...")
+                    OldEventDictionary = NewEventDictionary
+                    PreferedEntry = i 
+                    PreferedRLE = GetRLECode(InputChain)
+                    FirstAcceptedEvent = False
+                    continue
+                #otherwise if it's not and we have a duplicate, find the prefered, dump it to prefered
+                elif(GetRLECode(InputChain) == PreferedRLE and not FirstAcceptedEvent):
+                    #print("\t\t\t\tDuplicate event...")                                                                                                    
                     if(self.PriorityEvalFunction(NewEventDictionary,OldEventDictionary)):
                         #print("\t\t\t\t\tKeeping new event...")
                         PreferedEntry=i
                         PreferedRLE = GetRLECode(InputChain)
+                        OldEventDictionary = NewEventDictionary
                     else:
                         #print("\t\t\t\t\tKeeping old event...")
                         continue
-                    
-                else:
+                #otherwise, we have a non duplicate, call up the prefered old event, fill the tree, and then dump the new to prefered
+                elif(GetRLECode(InputChain) != PreferedRLE and not FirstAcceptedEvent):
                     #print("\t\t\t\tNon duplicate event, filling...")
-                    InputChain.GetEntry(PreferedEntry)
-                    OutputTree.Fill()
-                    InputChain.GetEntry(i)
-                    PreferedEntry=i
                     PreferedRLE=GetRLECode(InputChain)
+                    InputChain.GetEntry(PreferedEntry)
+                    OutputTree.Fill()                    
+                    PreferedEntry=i
+                    OldEventDictionary = NewEventDictionary
             else:
                 #print("\t\t\tFound bad event...")
                 continue
