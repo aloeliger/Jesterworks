@@ -234,9 +234,10 @@ class Jesterworks():
         print("\tWriting To File... ")
         OutputFile.cd()
         OutputTree.Write()
-        EventCounter.Write()
-        EventCounterWeights.Write()
-        pileup_mc.Write()
+        if(self.GrabHistos):
+            EventCounter.Write()
+            EventCounterWeights.Write()
+            pileup_mc.Write()
         OutputFile.Write()
         OutputFile.Close()
         print("Done Performing Skim...")
