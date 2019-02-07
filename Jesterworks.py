@@ -224,11 +224,7 @@ class Jesterworks():
                 TheFile = ROOT.TFile(self.InputFiles[i],"READ")
                 EventCounter.Add(TheFile.Get(self.Channel+AdditionalSlash+"eventCount"))
                 EventCounterWeights.Add(TheFile.Get(self.Channel+AdditionalSlash+"summedWeights"))
-                TheFile.Close()
-            
-                pileup_mc = ROOT.TH1F("pileup_mc","pileup_mc",80,0,80)
-                for Event in InputChain:
-                    pileup_mc.Fill(InputChain.nTruePU)
+                TheFile.Close()                            
         #Post skim
         print("\tPerforming Renaming...")
         for key in self.RenameDictionary:            
@@ -240,7 +236,6 @@ class Jesterworks():
         if(self.GrabHistos):
             EventCounter.Write()
             EventCounterWeights.Write()
-            pileup_mc.Write()
         OutputFile.Write()
         OutputFile.Close()
         print("Done Performing Skim...")
