@@ -126,6 +126,9 @@ class Jesterworks():
         print("Performing Skim...")
         print("\tSetting Up Output File...")
         OutputFile = ROOT.TFile(self.OutFileName+".root","RECREATE")
+        
+        print("\tSetting up scratch/working file...")
+        ScratchFile = ROOT.TFile(self.OutFileName+"_Scratch.root","RECREATE")
 
         print("\tSetting Up Input Chain...")
         AdditionalSlash = "/"
