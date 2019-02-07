@@ -1,4 +1,5 @@
 import ROOT
+import sys
 from Jesterworks import Jesterworks
 
 def TauIDSkim(TheEvent,SampleName=""):
@@ -34,6 +35,6 @@ def TauIDPriority(NewEventDictionary,OldEventDictionary):
         return False
 
 if __name__=="__main__":
-    TheSkim = Jesterworks("TauIDTestData_5Feb_19/TauIDConf.conf",TauIDSkim,TauIDPriority)
+    TheSkim = Jesterworks(sys.argv[1],TauIDSkim,TauIDPriority)
     TheSkim.CreateListOfFilesToRunOn()
     TheSkim.PerformSkim()
