@@ -55,6 +55,8 @@ class Jesterworks():
         self.PathList = []    
         self.PerformPreCuts = False
         self.PreCutList = []
+        self.AltGrabHistos = False
+        self.CancelationList = []
         self.SkimEvalFunction = SkimFunctionDefinition
         self.PriorityEvalFunction = PriorityFunctionDefinition
 
@@ -74,6 +76,12 @@ class Jesterworks():
                         elif self.Configuration[Token][Element] == "True":
                             self.GrabHistos = True
                         print("GrabHistos: "+str(self.GrabHistos))
+                    if(Element == "altgrabhistos"):
+                        if self.Configuration[Token][Element] == "False":
+                            self.AltGrabHistos = False
+                        elif self.Configuration[Token][Element] == "True":
+                            self.AltGrabHistos = True
+                        print("AltGrabHistos: "+str(self.GrabHistos))
 
                 if(Token == "INPUT"):
                     if(Element == "chain"):
@@ -95,7 +103,8 @@ class Jesterworks():
                         
                 if(Token == "RENAME"):
                     self.RenameDictionary[Element] = str(self.Configuration[Token][Element])
-                
+                if(Token == "CANCEL"):
+                    self.CancelationList.append(str(self.Configuration[Token][Element]))
                 if(Token == "PRECUTS"):
                     self.PerformPreCuts = True
                     self.PreCutList.append(str(self.Configuration[Token][Element]))
@@ -139,9 +148,28 @@ class Jesterworks():
         for FileName in self.InputFiles:            
             InputChain.Add(FileName)            
 
-        print("\tSetting Up Output Tree...")            
-        OutputTree=InputChain.CloneTree(0)
-        OutputTree.SetNameTitle(self.OutTreeName,self.OutTreeName)
+        #Okay, this may be causing errors.
+        #let's try creating this with it's own dictionary we read out too.
+        print("\tSetting Up Output Tree...")
+        OutputTreeDictionary = {}
+        OutputTree = ROOT.TTree(self.OutTreeName,self.OutTreeName)
+        for Branch in InputChain.GetListOfBranches():
+            if(Branch.GetName() =="run" or Branch.GetName() =="lumi" or Branch.GetName() == "evt"):
+                Value = array('I',[0])
+                OutputTree.Branch(Branch.GetName(),Value,Branch.GetName()+"/i")
+                OutputTreeDictionary[Branch.GetName()] = Value
+            elif (Branch.GetName() == "evt"):
+                Value = array('l',[0])                
+                OutputTree.Branch(Branch.GetName(),Value,Branch.GetName()+"/l")
+                OutputTreeDictionary[Branch.GetName()] = Value                
+            else:
+                Value = array('f',[0.])                
+                OutputTree.Branch(Branch.GetName(),Value,Branch.GetName()+"/F")
+                OutputTreeDictionary[Branch.GetName()] = Value                
+
+        print("\tPerforming cancelations...")
+        for Item in self.CancelationList:
+            OutputTree.GetBranch(Item).SetStatus(0)
 
         if(self.PerformPreCuts):
             print("\tPerforming precutting...")
@@ -149,24 +177,27 @@ class Jesterworks():
             for Cut in self.PreCutList:
                 CompleteCut+=("("+Cut+")&&")
             CompleteCut=CompleteCut[:len(CompleteCut)-2]
-            InputChain = InputChain.CopyTree(CompleteCut)
+            InputChain = InputChain.CopyTree(CompleteCut)        
         
         print("\tSetting up the event dictionaries...")
         EventValues = {}
         NewEventDictionary={}
         OldEventDictionary={}
         for Branch in InputChain.GetListOfBranches():
-            if(Branch.GetName() != "run"
-               and Branch.GetName() != "lumi"
-               and Branch.GetName() != "evt"):
+            if(Branch.GetName() == "run" or Branch.GetName() == "lumi"):
+                EventValues[Branch.GetName()] = array('I',[0])
+                Branch.SetAddress(EventValues[Branch.GetName()])
+            elif(Branch.GetName() == "evt"):
+                EventValues[Branch.GetName()] = array('l',[0])
+                Branch.SetAddress(EventValues[Branch.GetName()])
+            else:
                 EventValues[Branch.GetName()] = array('f',[0.])
                 Branch.SetAddress(EventValues[Branch.GetName()])        
 
         print("\tRunning The Chain...")        
         #Here's where the skim really happens, selection handled 
-        #via passed function.
-        PreferedEntry=0
-        PreferedRLE=''
+        #via passed function.    
+        PreferedRLE = ''
         FirstAcceptedEvent = True
         for i in tqdm(range(InputChain.GetEntries())):
             #print("\t\tGetting intial event...")
@@ -179,36 +210,34 @@ class Jesterworks():
                 #if it's the first event, automatically dump this to the prefered event dictionary and continue
                 if(FirstAcceptedEvent):
                     #print("\t\t\t\tFirst accepted event, making it prefered and moving on...")
-                    OldEventDictionary = NewEventDictionary
-                    PreferedEntry = i 
-                    PreferedRLE = GetRLECode(InputChain)
+                    OldEventDictionary = NewEventDictionary                    
                     FirstAcceptedEvent = False
                     continue
                 #otherwise if it's not and we have a duplicate, find the prefered, dump it to prefered
                 elif(GetRLECode(InputChain) == PreferedRLE and not FirstAcceptedEvent):
-                    #print("\t\t\t\tDuplicate event...")                                                                                                    
+                    #print("\t\t\t\tDuplicate event...")             
                     if(self.PriorityEvalFunction(NewEventDictionary,OldEventDictionary)):
                         #print("\t\t\t\t\tKeeping new event...")
-                        PreferedEntry=i
                         PreferedRLE = GetRLECode(InputChain)
                         OldEventDictionary = NewEventDictionary
                     else:
                         #print("\t\t\t\t\tKeeping old event...")
                         continue
-                #otherwise, we have a non duplicate, call up the prefered old event, fill the tree, and then dump the new to prefered
+                #otherwise, we have a non duplicate, put the old tree values in the Output dictionary, and fill
                 elif(GetRLECode(InputChain) != PreferedRLE and not FirstAcceptedEvent):
-                    #print("\t\t\t\tNon duplicate event, filling...")
-                    PreferedRLE=GetRLECode(InputChain)
-                    InputChain.GetEntry(PreferedEntry)
-                    OutputTree.Fill()                    
-                    PreferedEntry=i
+                    #print("\t\t\t\tNon duplicate event, filling...")                                        
+                    for key in OldEventDictionary:                        
+                        OutputTreeDictionary[key][0] = OldEventDictionary[key]
+                    OutputTree.Fill()                       
+                    PreferedRLE = GetRLECode(InputChain)
                     OldEventDictionary = NewEventDictionary
             else:
                 #print("\t\t\tFound bad event...")
                 continue
         #the loop leaves us with a good event queued, fill it.
-        InputChain.GetEntry(PreferedEntry)
-        OutputTree.Fill()
+        for key in OldEventDictionary:
+            OutputTreeDictionary[key][0] = OldEventDictionary[key]
+        OutputTree.Fill()                                        
 
         #grab the important histogram that come along with
         if(self.GrabHistos):
@@ -217,24 +246,38 @@ class Jesterworks():
             EventCounter = InitialFile.Get(self.Channel+AdditionalSlash+"eventCount").Clone()
             EventCounter.SetDirectory(0)
             EventCounterWeights = InitialFile.Get(self.Channel+AdditionalSlash+"summedWeights").Clone()
-            EventCounterWeights.SetDirectory(0)
-            OutputFile.cd()
+            EventCounterWeights.SetDirectory(0)            
             InitialFile.Close()        
             for i in range(1,len(self.InputFiles)):
                 TheFile = ROOT.TFile(self.InputFiles[i],"READ")
                 EventCounter.Add(TheFile.Get(self.Channel+AdditionalSlash+"eventCount"))
                 EventCounterWeights.Add(TheFile.Get(self.Channel+AdditionalSlash+"summedWeights"))
                 TheFile.Close()                            
+        if(self.AltGrabHistos):
+            print("\tGrabbing alternate meta histograms (Cecile names)...")
+            InitialFile = ROOT.TFile(self.InputFiles[0],"READ")
+            EventCounter = InitialFile.Get("nevents").Clone()
+            EventCounter.SetDirectory(0)
+            InitialFile.Close()
+            for i in range(1,len(self.InputFiles)):
+                TheFile = ROOT.TFile(self.InputFiles[i],"READ")
+                EventCounter.Add(TheFile.Get("nevents"))
+                TheFile.Close()
+            EventCounter.SetNameTitle("eventCount","eventCount")
+            
         #Post skim
         print("\tPerforming Renaming...")
-        for key in self.RenameDictionary:            
+        for key in self.RenameDictionary:
+            print("\t\t"+key+" -> "+self.RenameDictionary[key])
             OutputTree.GetBranch(key).SetNameTitle(self.RenameDictionary[key],self.RenameDictionary[key])
 
         print("\tWriting To File... ")
+        OutputTree.SetDirectory(0)
         OutputFile.cd()
         OutputTree.Write()
-        if(self.GrabHistos):
+        if(self.GrabHistos or self.AltGrabHistos):
             EventCounter.Write()
+        if(self.GrabHistos):            
             EventCounterWeights.Write()
         OutputFile.Write()
         OutputFile.Close()
