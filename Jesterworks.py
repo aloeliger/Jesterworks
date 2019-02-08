@@ -130,14 +130,18 @@ class Jesterworks():
                         break
         print("Done Generating List of Files To Run On...")
 
+    def RunOnListOfFiles(self):
+        for i in range(len(self.InputFiles)):
+            self.PerformSkim(self.InputFiles[i],i)
+
     #Here's where we do the all important skimming job.    
-    def PerformSkim(self):
+    def PerformSkim(self,TheFile,Index):
         print("Performing Skim...")
         print("\tSetting Up Output File...")
-        OutputFile = ROOT.TFile(self.OutFileName+".root","RECREATE")
+        OutputFile = ROOT.TFile(self.OutFileName+"_"+str(Index)+".root","RECREATE")
         
-        print("\tSetting up scratch/working file...")
-        ScratchFile = ROOT.TFile(self.OutFileName+"_Scratch.root","RECREATE")
+        #print("\tSetting up scratch/working file...")
+        #ScratchFile = ROOT.TFile(self.OutFileName+"_Scratch.root","RECREATE")
 
         print("\tSetting Up Input Chain...")
         AdditionalSlash = "/"
@@ -145,8 +149,9 @@ class Jesterworks():
             #no need to prepend a slash
             AdditionalSlash = ""
         InputChain = ROOT.TChain(self.Channel+AdditionalSlash+self.InputChainName)
-        for FileName in self.InputFiles:            
-            InputChain.Add(FileName)            
+        #for FileName in self.InputFiles:            
+        #InputChain.Add(FileName)            
+        InputChain.Add(TheFile)
 
         #Okay, this may be causing errors.
         #let's try creating this with it's own dictionary we read out too.
@@ -227,7 +232,7 @@ class Jesterworks():
                 elif(GetRLECode(InputChain) != PreferedRLE and not FirstAcceptedEvent):
                     #print("\t\t\t\tNon duplicate event, filling...")                                        
                     for key in OldEventDictionary:                        
-                        OutputTreeDictionary[key][0] = OldEventDictionary[key]
+                        OutputTreeDictionary[key][0] = OldEventDictionary[key]                        
                     OutputTree.Fill()                       
                     PreferedRLE = GetRLECode(InputChain)
                     OldEventDictionary = NewEventDictionary
@@ -272,7 +277,7 @@ class Jesterworks():
             OutputTree.GetBranch(key).SetNameTitle(self.RenameDictionary[key],self.RenameDictionary[key])
 
         print("\tWriting To File... ")
-        OutputTree.SetDirectory(0)
+        #OutputTree.SetDirectory(0)
         OutputFile.cd()
         OutputTree.Write()
         if(self.GrabHistos or self.AltGrabHistos):
