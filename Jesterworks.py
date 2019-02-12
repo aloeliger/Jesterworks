@@ -108,7 +108,7 @@ class Jesterworks():
                 if(Token == "PRECUTS"):
                     self.PerformPreCuts = True
                     self.PreCutList.append(str(self.Configuration[Token][Element]))
-        print("Done Processing Configuration")
+        print("Done Processing Configuration")            
         
     #Just generates a list of file paths that we can use later to hook trees
     #up to the relevant chain.
@@ -131,7 +131,10 @@ class Jesterworks():
         print("Done Generating List of Files To Run On...")
 
     def RunOnListOfFiles(self):
+        print("Running the list of files...")
+        print(self.InputFiles)
         for i in range(len(self.InputFiles)):
+            print("File: "+str(self.InputFiles[i]))
             self.PerformSkim(self.InputFiles[i],i)
 
     #Here's where we do the all important skimming job.    
@@ -155,11 +158,12 @@ class Jesterworks():
 
         #Okay, this may be causing errors.
         #let's try creating this with it's own dictionary we read out too.
+        #need to fix this so we don't have to hard code the int branches
         print("\tSetting Up Output Tree...")
         OutputTreeDictionary = {}
         OutputTree = ROOT.TTree(self.OutTreeName,self.OutTreeName)
         for Branch in InputChain.GetListOfBranches():
-            if(Branch.GetName() =="run" or Branch.GetName() =="lumi" or Branch.GetName() == "evt"):
+            if(Branch.GetName() =="run" or Branch.GetName() =="lumi" or Branch.GetName() == "njets" or Branch.GetName() == "nbtag" or Branch.GetName() == "gen_match_2" or Branch.GetName() == "gen_match_1"):
                 Value = array('I',[0])
                 OutputTree.Branch(Branch.GetName(),Value,Branch.GetName()+"/i")
                 OutputTreeDictionary[Branch.GetName()] = Value
@@ -189,7 +193,7 @@ class Jesterworks():
         NewEventDictionary={}
         OldEventDictionary={}
         for Branch in InputChain.GetListOfBranches():
-            if(Branch.GetName() == "run" or Branch.GetName() == "lumi"):
+            if(Branch.GetName() == "run" or Branch.GetName() == "lumi" or Branch.GetName() == "njets" or Branch.GetName() == "nbtag" or Branch.GetName() == "gen_match_2" or Branch.GetName() == "gen_match_1"):
                 EventValues[Branch.GetName()] = array('I',[0])
                 Branch.SetAddress(EventValues[Branch.GetName()])
             elif(Branch.GetName() == "evt"):
