@@ -14,7 +14,7 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
     TauVector.SetPtEtaPhiM(TheEvent.pt_2,TheEvent.eta_2,TheEvent.phi_2,TheEvent.m_2)
     METVector.SetPtEtaPhiM(TheEvent.met,0.0,TheEvent.metphi,0.0)
 
-    if(abs(TheEvent.eta_1) or abs(TheEvent.eta_2)):
+    if(abs(TheEvent.eta_1) > 2.1 or abs(TheEvent.eta_2) > 2.3):
         isGoodEvent = False
         
     if(TheEvent.flag_goodVertices
@@ -69,8 +69,8 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
     if(TheEvent.pt_2 < 20 or (TheEvent.njets > 0 and TheEvent.pt_2 < 30)):
         isGoodEvent = False
 
-    if(SampleName == "DY" and TheEvent.gen_match_2 == 5):
-        isGoodEvent = False
+    #if(SampleName == "DY" and TheEvent.gen_match_2 == 5):
+    #    isGoodEvent = False
     
     MT = math.sqrt(2.0*MuonVector.Pt()*METVector.Pt()*(1.0-math.cos(MuonVector.DeltaPhi(MuonVector))))
     
@@ -97,4 +97,4 @@ if __name__ == "__main__":
     ConfFile  =sys.argv[1]
     TheSkim = Jesterworks(ConfFile,HTTSelectionCuts,TrivialPriority)
     TheSkim.CreateListOfFilesToRunOn()
-    TheSkim.PerformSkim()
+    TheSkim.RunOnListOfFiles()
