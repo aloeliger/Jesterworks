@@ -10,6 +10,7 @@ import os, sys, configparser
 import glob
 from tqdm import tqdm
 from array import array
+import ctypes
 
 #default version of a skim function. Tells you what to actually do
 def DefaultSkimFunction(TheEvent):
@@ -163,11 +164,14 @@ class Jesterworks():
         OutputTreeDictionary = {}
         OutputTree = ROOT.TTree(self.OutTreeName,self.OutTreeName)
         for Branch in InputChain.GetListOfBranches():
-            if(Branch.GetName() =="run" or Branch.GetName() =="lumi" or Branch.GetName() == "njets" or Branch.GetName() == "nbtag" or Branch.GetName() == "gen_match_2" or Branch.GetName() == "gen_match_1"):
+            ExpectedClass = ROOT.TClass()
+            ExpectedType = ctypes.c_long(0)
+            Branch.GetExpectedType(ExpectedClass,ExpectedType)
+            if(ExpectedType.value == ROOT.kInt_t):
                 Value = array('I',[0])
                 OutputTree.Branch(Branch.GetName(),Value,Branch.GetName()+"/i")
                 OutputTreeDictionary[Branch.GetName()] = Value
-            elif (Branch.GetName() == "evt"):
+            elif (ExpectedType.value == ROOT.kLong_t):
                 Value = array('l',[0])                
                 OutputTree.Branch(Branch.GetName(),Value,Branch.GetName()+"/l")
                 OutputTreeDictionary[Branch.GetName()] = Value                
@@ -193,10 +197,13 @@ class Jesterworks():
         NewEventDictionary={}
         OldEventDictionary={}
         for Branch in InputChain.GetListOfBranches():
-            if(Branch.GetName() == "run" or Branch.GetName() == "lumi" or Branch.GetName() == "njets" or Branch.GetName() == "nbtag" or Branch.GetName() == "gen_match_2" or Branch.GetName() == "gen_match_1"):
+            ExpectedClass = ROOT.TClass()
+            ExpectedType = ctypes.c_long(0)
+            Branch.GetExpectedType(ExpectedClass,ExpectedType)
+            if(ExpectedType.value == ROOT.kInt_t):
                 EventValues[Branch.GetName()] = array('I',[0])
                 Branch.SetAddress(EventValues[Branch.GetName()])
-            elif(Branch.GetName() == "evt"):
+            elif(ExpectedType.value == ROOT.kLong_t):
                 EventValues[Branch.GetName()] = array('l',[0])
                 Branch.SetAddress(EventValues[Branch.GetName()])
             else:
