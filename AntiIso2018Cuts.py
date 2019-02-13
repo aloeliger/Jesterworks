@@ -52,7 +52,7 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
     if(not Trigger24): #and not Trigger27 and not Trigger2027):
         isGoodEvent = False
 
-    if(not TheEvent.againstElectronTightMVA6_2 or not TheEvent.againstMuonLoose3_2):
+    if(not TheEvent.againstElectronLooseMVA6_2 or not TheEvent.againstMuonTight3_2):
         isGoodEvent = False
 
     #Cecile has some weird stuff here.
