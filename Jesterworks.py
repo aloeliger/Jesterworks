@@ -133,7 +133,8 @@ class Jesterworks():
 
     def RunOnListOfFiles(self):
         print("Running the list of files...")
-        print(self.InputFiles)
+        if(not self.InputFiles):
+            print("\tList of files empty!")
         for i in range(len(self.InputFiles)):
             print("File: "+str(self.InputFiles[i]))
             self.PerformSkim(self.InputFiles[i],i)
@@ -258,17 +259,17 @@ class Jesterworks():
         #grab the important histogram that come along with
         if(self.GrabHistos):
             print("\tCreating Meta Histograms...")
-            InitialFile = ROOT.TFile(self.InputFiles[0],"READ")
+            InitialFile = ROOT.TFile(TheFile,"READ")
             EventCounter = InitialFile.Get(self.Channel+AdditionalSlash+"eventCount").Clone()
             EventCounter.SetDirectory(0)
             EventCounterWeights = InitialFile.Get(self.Channel+AdditionalSlash+"summedWeights").Clone()
             EventCounterWeights.SetDirectory(0)            
             InitialFile.Close()        
-            for i in range(1,len(self.InputFiles)):
-                TheFile = ROOT.TFile(self.InputFiles[i],"READ")
-                EventCounter.Add(TheFile.Get(self.Channel+AdditionalSlash+"eventCount"))
-                EventCounterWeights.Add(TheFile.Get(self.Channel+AdditionalSlash+"summedWeights"))
-                TheFile.Close()                            
+            #for i in range(1,len(self.InputFiles)):
+            #    TheFile = ROOT.TFile(self.InputFiles[i],"READ")
+            #    EventCounter.Add(TheFile.Get(self.Channel+AdditionalSlash+"eventCount"))
+            #    EventCounterWeights.Add(TheFile.Get(self.Channel+AdditionalSlash+"summedWeights"))
+            #    TheFile.Close()                            
         if(self.AltGrabHistos):
             print("\tGrabbing alternate meta histograms (Cecile names)...")
             InitialFile = ROOT.TFile(self.InputFiles[0],"READ")
@@ -284,8 +285,11 @@ class Jesterworks():
         #Post skim
         print("\tPerforming Renaming...")
         for key in self.RenameDictionary:
-            print("\t\t"+key+" -> "+self.RenameDictionary[key])
-            OutputTree.GetBranch(key).SetNameTitle(self.RenameDictionary[key],self.RenameDictionary[key])
+            #print("\t\t"+key+" -> "+self.RenameDictionary[key])
+            try:
+                OutputTree.GetBranch(key).SetNameTitle(self.RenameDictionary[key],self.RenameDictionary[key])
+            except:
+                print("\t\tFailed to rename: "+key+" -> "+self.RenameDictionary[key])
 
         print("\tWriting To File... ")
         #OutputTree.SetDirectory(0)
