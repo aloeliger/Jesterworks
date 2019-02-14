@@ -11,6 +11,8 @@ import glob
 from tqdm import tqdm
 from array import array
 import ctypes
+import threading
+import Queue
 
 #default version of a skim function. Tells you what to actually do
 def DefaultSkimFunction(TheEvent):
@@ -33,6 +35,12 @@ def DefaultPriorityFunction(NewEventDictionary,OldEventDictrionary):
 #things against.
 def GetRLECode(TheEvent):
     return str(TheEvent.run)+":"+str(TheEvent.lumi)+":"+str(TheEvent.evt)
+
+class SkimThread(threading.Thread):
+    def __init__(self):
+        pass
+    def run(self):
+        pass
 
 class Jesterworks():
     #takes a configuration, a skimming function, and a priority function
