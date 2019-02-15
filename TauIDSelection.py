@@ -37,4 +37,4 @@ def TauIDPriority(NewEventDictionary,OldEventDictionary):
 if __name__=="__main__":
     TheSkim = Jesterworks(sys.argv[1],TauIDSkim,TauIDPriority)
     TheSkim.CreateListOfFilesToRunOn()
-    TheSkim.RunOnListOfFiles()
+    TheSkim.Run()
