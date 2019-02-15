@@ -13,6 +13,14 @@ from array import array
 import ctypes
 import threading
 import Queue
+import curses
+import logging
+
+#global locks and queues.
+queueLock = threading.Lock()
+threadLock = threading.Lock()
+WorkQueue = Queue.Queue()
+IDQueue = Queue.Queue()
 
 #default version of a skim function. Tells you what to actually do
 def DefaultSkimFunction(TheEvent):
@@ -36,19 +44,16 @@ def DefaultPriorityFunction(NewEventDictionary,OldEventDictrionary):
 def GetRLECode(TheEvent):
     return str(TheEvent.run)+":"+str(TheEvent.lumi)+":"+str(TheEvent.evt)
 
-queueLock = threading.Lock()
-threadLock = threading.Lock()
-WorkQueue = Queue.Queue()
-IDQueue = Queue.Queue()
-
 #the thread takes the Jesterworks instance it was called from as an argument
 #a large amount of the variables that don't change to file to file should be
 #mirrored exactly here so that the skim process doesn't have to change massively
 class SkimThread(threading.Thread):
-    def __init__(self,JesterworksInstance):
+    def __init__(self,JesterworksInstance,TheWindow):
+        threading.Thread.__init__(self)
         self.TheJesterworksInstance = JesterworksInstance
+        self.TheWindow = TheWindow
     def run(self):
-        self.TheJesterworksInstance.ThreadHandle()
+        self.TheJesterworksInstance.ThreadHandle(self.TheWindow)
 
 class Jesterworks():
     #takes a configuration, a skimming function, and a priority function
@@ -148,43 +153,114 @@ class Jesterworks():
                         break
         print("Done Generating List of Files To Run On...")
 
+    #legacy method for running on lists of files
     def RunOnListOfFiles(self):
         for i in range(len(self.InputFiles)):
             print("File: "+str(self.InputFiles[i]))
             self.PerformSkim(self.InputFiles[i],i)
 
-    def GenerateThreads(self):
-        print("Generating the list of threads...")
-        print(self.InputFiles)
-        #first things first, let's get names and thread numbers
-        #put those in a queue, and then we'll make like 6 threads
-        #and while there's something to do, each thread can pop
-        # a file and a number off of a queue, then get about runninng it.
+    #the most central function after a run call
+    def GenerateThreads(self,stdscr):        
+        logging.basicConfig(filename=self.OutFileName+"_Err.log",level=logging.DEBUG)
+        print("Generating the list of threads...")        
         queueLock.acquire()
+        print("Generating Queues...")
         for i in range(len(self.InputFiles)):
             WorkQueue.put(self.InputFiles[i])
             IDQueue.put(i)
-        queueLock.acquire()
+        print("Done Generating Queues...")
 
-        threadLock.acquire()
+        #initialize some curses things
+        curses.init_pair(1,curses.COLOR_RED, curses.COLOR_BLACK)
+        curses.init_pair(2,curses.COLOR_GREEN, curses.COLOR_BLACK)
+
+        TermRows, TermColumns = os.popen('stty size','r').read().split()
+        TermRows = int(TermRows)
+        TermColumns = int(TermColumns)
+        queueLock.release()
+        stdscr.clear()
+        stdscr.refresh()
+        baseWin = curses.newwin(4,TermColumns-2,TermRows-4,0)        
+        baseWin.box()
+        baseWin.refresh()
+        
+        ThreadWindows = []
+        WindowIncrement = (TermRows-4)/6
+        
+        threadLock.acquire()        
         for i in range(6):
-            TheThread = SkimThread(self)
+            ThreadWindows.append(curses.newwin(WindowIncrement,
+                                               TermColumns-2,
+                                               i*WindowIncrement,
+                                               0))
+            ThreadWindows[i].box()
+            ThreadWindows[i].refresh()
+            TheThread = SkimThread(self,ThreadWindows[i])
             TheThread.start()
-            self.Threads.append(TheThread)
+            self.Threads.append(TheThread)        
         threadLock.release()
 
+
+        #main loop while threads process...        
+        while not WorkQueue.empty():
+            
+            queueLock.acquire()
+            threadLock.acquire()        
+            baseWin.addstr(1,1,str(WorkQueue.qsize())+" Files remaining in queue")
+            baseWin.refresh()
+            threadLock.release()
+            queueLock.release()
+
+        if WorkQueue.empty():
+            queueLock.acquire()
+            threadLock.acquire()        
+            baseWin.addstr(1,1,str(WorkQueue.qsize())+" Files remaining in queue")
+            baseWin.refresh()
+            threadLock.release()
+            queueLock.release()
+        
         for i in range(len(self.Threads)):
-            self.Threads[i].join()
+            self.Threads[i].join()            
+            
+        threadLock.acquire()        
+        baseWin.addstr(2,1,"Done!",curses.A_BLINK | curses.color_pair(2))
+        baseWin.refresh()
+        threadLock.release()
+        stdscr.getch()
 
 
     #Here's where we do the all important skimming job.    
     #it's designed to be handed to a thread, so the self calls here 
-    def PerformSkim(self,TheFile,Index):
-        print("Performing Skim...")
-        print("\tSetting Up Output File...")
-        OutputFile = ROOT.TFile(self.OutFileName+"_"+str(Index)+".root","RECREATE")                
+    def PerformSkim(self,TheFile,Index,TheWindow):
+        
+        #the crap we gotta go through to print a line to the screen...
+        threadLock.acquire()
+        TheWindow.erase()
+        TheWindow.move(1,1)
+        TheWindow.insertln()
+        TheWindow.addstr(1,1,"Performing Skim...")
+        TheWindow.box()
+        TheWindow.refresh()
+        threadLock.release()
+        
 
-        print("\tSetting Up Input Chain...")
+        threadLock.acquire()
+        TheWindow.move(1,1)
+        TheWindow.insertln()
+        TheWindow.addstr(1,1,"\tSetting Up Output File...")
+        TheWindow.box()
+        TheWindow.refresh()
+        threadLock.release()
+        
+        OutputFile = ROOT.TFile(self.OutFileName+"_"+str(Index)+".root","RECREATE")                
+        threadLock.acquire()
+        TheWindow.move(1,1)
+        TheWindow.insertln()
+        TheWindow.addstr(1,1,"\tSetting Up Input Chain...")
+        TheWindow.box()
+        TheWindow.refresh()
+        threadLock.release()
+        
         AdditionalSlash = "/"
         if self.Channel == "":
             #no need to prepend a slash
@@ -193,7 +269,15 @@ class Jesterworks():
         InputChain.Add(TheFile)
 
         #creates output tree, and a dictionary it reads from
-        print("\tSetting Up Output Tree...")
+
+        threadLock.acquire()
+        TheWindow.move(1,1)
+        TheWindow.insertln()
+        TheWindow.addstr(1,1,"\tSetting Up Output Tree...")
+        TheWindow.box()
+        TheWindow.refresh()
+        threadLock.release()
+
         OutputTreeDictionary = {}
         OutputTree = ROOT.TTree(self.OutTreeName,self.OutTreeName)
         for Branch in InputChain.GetListOfBranches():
@@ -213,7 +297,15 @@ class Jesterworks():
                 OutputTree.Branch(Branch.GetName(),Value,Branch.GetName()+"/F")
                 OutputTreeDictionary[Branch.GetName()] = Value                
         #cancelations:
-        print("\tPerforming cancelations...")
+        
+        threadLock.acquire()
+        TheWindow.move(1,1)
+        TheWindow.insertln()
+        TheWindow.addstr(1,1,"\tPerforming cancelations...")
+        TheWindow.box()
+        TheWindow.refresh()
+        threadLock.release()
+
         for Item in self.CancelationList:
             OutputTree.GetBranch(Item).SetStatus(0)
 
@@ -221,7 +313,15 @@ class Jesterworks():
         #the cut string provided shouldn't need to access the full tree
         #entry the same way that a GetEntry call might.
         if(self.PerformPreCuts):
-            print("\tPerforming precutting...")
+
+            threadLock.acquire()
+            TheWindow.move(1,1)
+            TheWindow.insertln()
+            TheWindow.addstr(1,1,"\tPerforming precutting...")
+            TheWindow.box()
+            TheWindow.refresh()
+            threadLock.release()
+
             CompleteCut = ""
             for Cut in self.PreCutList:
                 CompleteCut+=("("+Cut+")&&")
@@ -231,7 +331,15 @@ class Jesterworks():
         #provide dictionaries in the same vein as the output tree dictoinary
         #one will be to hold the current prefered version of an event "old"
         #the other to hold whichever one we are reading now "new"
-        print("\tSetting up the event dictionaries...")
+
+        threadLock.acquire()
+        TheWindow.move(1,1)
+        TheWindow.insertln()
+        TheWindow.addstr(1,1,"\tSetting up the event dictionaries...")
+        TheWindow.box()
+        TheWindow.refresh()
+        threadLock.release()
+        
         EventValues = {}
         NewEventDictionary={}
         OldEventDictionary={}
@@ -249,12 +357,19 @@ class Jesterworks():
                 EventValues[Branch.GetName()] = array('f',[0.])
                 Branch.SetAddress(EventValues[Branch.GetName()])        
 
-        print("\tRunning The Chain...")        
+        threadLock.acquire()
+        TheWindow.move(1,1)
+        TheWindow.insertln()
+        TheWindow.addstr(1,1,"\tRunning The Chain...",curses.color_pair(1) | curses.A_BLINK)
+        TheWindow.box()
+        TheWindow.refresh()
+        threadLock.release()
+
         #Here's where the skim really happens, selection handled 
         #via passed function.    
         PreferedRLE = ''
         FirstAcceptedEvent = True
-        for i in tqdm(range(InputChain.GetEntries())):            
+        for i in range(InputChain.GetEntries()):            
             InputChain.GetEntry(i)            
             if self.SkimEvalFunction(InputChain,self.SampleName):
                 #Good event. Automatically fill The new event dictionary.
@@ -289,7 +404,14 @@ class Jesterworks():
 
         #grab the important histogram that come along with
         if(self.GrabHistos):
-            #print("\tCreating Meta Histograms...")
+            threadLock.acquire()
+            TheWindow.move(1,1)
+            TheWindow.insertln()
+            TheWindow.addstr(1,1,"\tCreating Meta Histograms...")
+            TheWindow.box()
+            TheWindow.refresh()
+            threadLock.release()
+            
             InitialFile = ROOT.TFile(self.InputFiles[0],"READ")
             EventCounter = InitialFile.Get(self.Channel+AdditionalSlash+"eventCount").Clone()
             EventCounter.SetDirectory(0)
@@ -302,7 +424,15 @@ class Jesterworks():
                 EventCounterWeights.Add(TheFile.Get(self.Channel+AdditionalSlash+"summedWeights"))
                 TheFile.Close()                            
         if(self.AltGrabHistos):
-            #print("\tGrabbing alternate meta histograms (Cecile names)...")
+            
+            threadLock.acquire()
+            TheWindow.move(1,1)
+            TheWindow.insertln()
+            TheWindow.addstr(1,1,"\tGrabbing alternate meta histograms (Cecile names)...")
+            TheWindow.box()
+            TheWindow.refresh()
+            threadLock.release()
+
             InitialFile = ROOT.TFile(self.InputFiles[0],"READ")
             EventCounter = InitialFile.Get("nevents").Clone()
             EventCounter.SetDirectory(0)
@@ -314,9 +444,15 @@ class Jesterworks():
             EventCounter.SetNameTitle("eventCount","eventCount")
             
         #Post skim
-        #print("\tPerforming Renaming...")
-        for key in self.RenameDictionary:
-            print("\t\t"+key+" -> "+self.RenameDictionary[key])
+        threadLock.acquire()
+        TheWindow.move(1,1)
+        TheWindow.insertln()
+        TheWindow.addstr(1,1,"\tPerforming Renaming...")
+        TheWindow.box()
+        TheWindow.refresh()
+        threadLock.release()
+        
+        for key in self.RenameDictionary:            
             OutputTree.GetBranch(key).SetNameTitle(self.RenameDictionary[key],self.RenameDictionary[key])
 
         #print("\tWriting To File... ")
@@ -329,22 +465,54 @@ class Jesterworks():
             EventCounterWeights.Write()
         OutputFile.Write()
         OutputFile.Close()
-        print("Done Performing Skim...")
 
-    def ThreadHandle(self):
+        threadLock.acquire()
+        TheWindow.move(1,1)
+        TheWindow.insertln()
+        TheWindow.addstr(1,1,"Done Performing Skim!",curses.color_pair(2) | curses.A_BLINK)
+        TheWindow.box()
+        TheWindow.refresh()
+        threadLock.release()
+
+    def ThreadHandle(self,TheWindow):
         #do we have something to do?
         SomethingToDo = True
         IndexNum = 0
         FilePath = ""
+        
         while SomethingToDo:
-            queueLock.acquire()
+            queueLock.acquire()            
+            
             if WorkQueue.empty():
-                somethingToDo = False
-                queueLock.acquire()
+                SomethingToDo = False
+                queueLock.release()
             else:
                 IndexNum = IDQueue.get()
                 FilePath = WorkQueue.get()
                 queueLock.release()
-                self.PerformSkim(FilePath,IndexNum)
+                try:
+                    self.PerformSkim(FilePath,IndexNum,TheWindow)
+                    threadLock.acquire()
+                    TheWindow.erase()
+                    TheWindow.addstr(1,1,"DONE!", curses.color_pair(2)|curses.A_BOLD)
+                    TheWindow.box()
+                    TheWindow.refresh()
+                    threadLock.release()
+                except:
+                    threadLock.acquire()
+                    TheWindow.erase()
+                    TheWindow.addstr(1,1,"ERROR!", curses.color_pair(1)|curses.A_BOLD)
+                    TheWindow.box()
+                    TheWindow.refresh()
+                    
+                    logging.warning("File failed.")
+                    logging.debug(FilePath)
+                    threadLock.release()
+                                
+        
+    
+    #Wraps the generate threads call for curses
+    def Run(self):
+        curses.wrapper(self.GenerateThreads)
 if __name__ == "__main__":
     print("Can't call this file. Please create a specific file with a skimming function(takes a chain with values ready to go as an argument and a sample name, returns true if this event is to be accepted, and false otherwise), a priority function (takes two dictionaries with branch name keys, returns true to keep the new event, false otherwise) and a main that creates a tau skim instance, and gives it both a configuration file, and these functions.")
