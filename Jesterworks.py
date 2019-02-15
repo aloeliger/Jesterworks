@@ -36,11 +36,19 @@ def DefaultPriorityFunction(NewEventDictionary,OldEventDictrionary):
 def GetRLECode(TheEvent):
     return str(TheEvent.run)+":"+str(TheEvent.lumi)+":"+str(TheEvent.evt)
 
+queueLock = threading.Lock()
+threadLock = threading.Lock()
+WorkQueue = Queue.Queue()
+IDQueue = Queue.Queue()
+
+#the thread takes the Jesterworks instance it was called from as an argument
+#a large amount of the variables that don't change to file to file should be
+#mirrored exactly here so that the skim process doesn't have to change massively
 class SkimThread(threading.Thread):
-    def __init__(self):
-        pass
+    def __init__(self,JesterworksInstance):
+        self.TheJesterworksInstance = JesterworksInstance
     def run(self):
-        pass
+        self.TheJesterworksInstance.ThreadHandle()
 
 class Jesterworks():
     #takes a configuration, a skimming function, and a priority function
@@ -68,6 +76,7 @@ class Jesterworks():
         self.CancelationList = []
         self.SkimEvalFunction = SkimFunctionDefinition
         self.PriorityEvalFunction = PriorityFunctionDefinition
+        self.Threads=[]
 
         print("Processing Configuration...")
         for Token in self.Configuration:
@@ -140,34 +149,50 @@ class Jesterworks():
         print("Done Generating List of Files To Run On...")
 
     def RunOnListOfFiles(self):
-        print("Running the list of files...")
-        print(self.InputFiles)
         for i in range(len(self.InputFiles)):
             print("File: "+str(self.InputFiles[i]))
             self.PerformSkim(self.InputFiles[i],i)
 
+    def GenerateThreads(self):
+        print("Generating the list of threads...")
+        print(self.InputFiles)
+        #first things first, let's get names and thread numbers
+        #put those in a queue, and then we'll make like 6 threads
+        #and while there's something to do, each thread can pop
+        # a file and a number off of a queue, then get about runninng it.
+        queueLock.acquire()
+        for i in range(len(self.InputFiles)):
+            WorkQueue.put(self.InputFiles[i])
+            IDQueue.put(i)
+        queueLock.acquire()
+
+        threadLock.acquire()
+        for i in range(6):
+            TheThread = SkimThread(self)
+            TheThread.start()
+            self.Threads.append(TheThread)
+        threadLock.release()
+
+        for i in range(len(self.Threads)):
+            self.Threads[i].join()
+
+
     #Here's where we do the all important skimming job.    
+    #it's designed to be handed to a thread, so the self calls here 
     def PerformSkim(self,TheFile,Index):
         print("Performing Skim...")
         print("\tSetting Up Output File...")
-        OutputFile = ROOT.TFile(self.OutFileName+"_"+str(Index)+".root","RECREATE")
-        
-        #print("\tSetting up scratch/working file...")
-        #ScratchFile = ROOT.TFile(self.OutFileName+"_Scratch.root","RECREATE")
+        OutputFile = ROOT.TFile(self.OutFileName+"_"+str(Index)+".root","RECREATE")                
 
         print("\tSetting Up Input Chain...")
         AdditionalSlash = "/"
         if self.Channel == "":
             #no need to prepend a slash
             AdditionalSlash = ""
-        InputChain = ROOT.TChain(self.Channel+AdditionalSlash+self.InputChainName)
-        #for FileName in self.InputFiles:            
-        #InputChain.Add(FileName)            
+        InputChain = ROOT.TChain(self.Channel+AdditionalSlash+self.InputChainName)       
         InputChain.Add(TheFile)
 
-        #Okay, this may be causing errors.
-        #let's try creating this with it's own dictionary we read out too.
-        #need to fix this so we don't have to hard code the int branches
+        #creates output tree, and a dictionary it reads from
         print("\tSetting Up Output Tree...")
         OutputTreeDictionary = {}
         OutputTree = ROOT.TTree(self.OutTreeName,self.OutTreeName)
@@ -187,11 +212,14 @@ class Jesterworks():
                 Value = array('f',[0.])                
                 OutputTree.Branch(Branch.GetName(),Value,Branch.GetName()+"/F")
                 OutputTreeDictionary[Branch.GetName()] = Value                
-
+        #cancelations:
         print("\tPerforming cancelations...")
         for Item in self.CancelationList:
             OutputTree.GetBranch(Item).SetStatus(0)
 
+        #precutting, hopefully speeds up skims
+        #the cut string provided shouldn't need to access the full tree
+        #entry the same way that a GetEntry call might.
         if(self.PerformPreCuts):
             print("\tPerforming precutting...")
             CompleteCut = ""
@@ -200,6 +228,9 @@ class Jesterworks():
             CompleteCut=CompleteCut[:len(CompleteCut)-2]
             InputChain = InputChain.CopyTree(CompleteCut)        
         
+        #provide dictionaries in the same vein as the output tree dictoinary
+        #one will be to hold the current prefered version of an event "old"
+        #the other to hold whichever one we are reading now "new"
         print("\tSetting up the event dictionaries...")
         EventValues = {}
         NewEventDictionary={}
@@ -223,41 +254,34 @@ class Jesterworks():
         #via passed function.    
         PreferedRLE = ''
         FirstAcceptedEvent = True
-        for i in tqdm(range(InputChain.GetEntries())):
-            #print("\t\tGetting intial event...")
+        for i in tqdm(range(InputChain.GetEntries())):            
             InputChain.GetEntry(i)            
-            if self.SkimEvalFunction(InputChain,self.SampleName):                
-                #print("\t\t\tFound good event...")
+            if self.SkimEvalFunction(InputChain,self.SampleName):
                 #Good event. Automatically fill The new event dictionary.
                 for key in EventValues:
                     NewEventDictionary[key] = EventValues[key][0]
                 #if it's the first event, automatically dump this to the prefered event dictionary and continue
-                if(FirstAcceptedEvent):
-                    #print("\t\t\t\tFirst accepted event, making it prefered and moving on...")
-                    OldEventDictionary = NewEventDictionary                    
+                if(FirstAcceptedEvent):                    
+                    OldEventDictionary = NewEventDictionary
                     FirstAcceptedEvent = False
                     continue
                 #otherwise if it's not and we have a duplicate, find the prefered, dump it to prefered
                 elif(GetRLECode(InputChain) == PreferedRLE and not FirstAcceptedEvent):
-                    #print("\t\t\t\tDuplicate event...")             
-                    if(self.PriorityEvalFunction(NewEventDictionary,OldEventDictionary)):
-                        #print("\t\t\t\t\tKeeping new event...")
+                    if(self.PriorityEvalFunction(NewEventDictionary,OldEventDictionary)):                        
                         PreferedRLE = GetRLECode(InputChain)
                         OldEventDictionary = NewEventDictionary
-                    else:
-                        #print("\t\t\t\t\tKeeping old event...")
+                    else:                        
                         continue
                 #otherwise, we have a non duplicate, put the old tree values in the Output dictionary, and fill
-                elif(GetRLECode(InputChain) != PreferedRLE and not FirstAcceptedEvent):
-                    #print("\t\t\t\tNon duplicate event, filling...")                                        
+                elif(GetRLECode(InputChain) != PreferedRLE and not FirstAcceptedEvent):                    
                     for key in OldEventDictionary:                        
                         OutputTreeDictionary[key][0] = OldEventDictionary[key]                        
                     OutputTree.Fill()                       
                     PreferedRLE = GetRLECode(InputChain)
                     OldEventDictionary = NewEventDictionary
-            else:
-                #print("\t\t\tFound bad event...")
+            else:                
                 continue
+
         #the loop leaves us with a good event queued, fill it.
         for key in OldEventDictionary:
             OutputTreeDictionary[key][0] = OldEventDictionary[key]
@@ -265,7 +289,7 @@ class Jesterworks():
 
         #grab the important histogram that come along with
         if(self.GrabHistos):
-            print("\tCreating Meta Histograms...")
+            #print("\tCreating Meta Histograms...")
             InitialFile = ROOT.TFile(self.InputFiles[0],"READ")
             EventCounter = InitialFile.Get(self.Channel+AdditionalSlash+"eventCount").Clone()
             EventCounter.SetDirectory(0)
@@ -278,7 +302,7 @@ class Jesterworks():
                 EventCounterWeights.Add(TheFile.Get(self.Channel+AdditionalSlash+"summedWeights"))
                 TheFile.Close()                            
         if(self.AltGrabHistos):
-            print("\tGrabbing alternate meta histograms (Cecile names)...")
+            #print("\tGrabbing alternate meta histograms (Cecile names)...")
             InitialFile = ROOT.TFile(self.InputFiles[0],"READ")
             EventCounter = InitialFile.Get("nevents").Clone()
             EventCounter.SetDirectory(0)
@@ -290,12 +314,12 @@ class Jesterworks():
             EventCounter.SetNameTitle("eventCount","eventCount")
             
         #Post skim
-        print("\tPerforming Renaming...")
+        #print("\tPerforming Renaming...")
         for key in self.RenameDictionary:
             print("\t\t"+key+" -> "+self.RenameDictionary[key])
             OutputTree.GetBranch(key).SetNameTitle(self.RenameDictionary[key],self.RenameDictionary[key])
 
-        print("\tWriting To File... ")
+        #print("\tWriting To File... ")
         #OutputTree.SetDirectory(0)
         OutputFile.cd()
         OutputTree.Write()
@@ -307,5 +331,20 @@ class Jesterworks():
         OutputFile.Close()
         print("Done Performing Skim...")
 
+    def ThreadHandle(self):
+        #do we have something to do?
+        SomethingToDo = True
+        IndexNum = 0
+        FilePath = ""
+        while SomethingToDo:
+            queueLock.acquire()
+            if WorkQueue.empty():
+                somethingToDo = False
+                queueLock.acquire()
+            else:
+                IndexNum = IDQueue.get()
+                FilePath = WorkQueue.get()
+                queueLock.release()
+                self.PerformSkim(FilePath,IndexNum)
 if __name__ == "__main__":
     print("Can't call this file. Please create a specific file with a skimming function(takes a chain with values ready to go as an argument and a sample name, returns true if this event is to be accepted, and false otherwise), a priority function (takes two dictionaries with branch name keys, returns true to keep the new event, false otherwise) and a main that creates a tau skim instance, and gives it both a configuration file, and these functions.")
