@@ -94,4 +94,4 @@ if __name__ == "__main__":
     ConfFile  =sys.argv[1]
     TheSkim = Jesterworks(ConfFile,HTTSelectionCuts,TrivialPriority)
     TheSkim.CreateListOfFilesToRunOn()
-    TheSkim.RunOnListOfFiles()
+    TheSkim.Run()
