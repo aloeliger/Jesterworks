@@ -228,8 +228,7 @@ class Jesterworks():
         threadLock.acquire()        
         baseWin.addstr(2,1,"Done!",curses.A_BLINK | curses.color_pair(2))
         baseWin.refresh()
-        threadLock.release()
-        stdscr.getch()
+        threadLock.release()        
 
 
     #Here's where we do the all important skimming job.    
@@ -461,6 +460,7 @@ class Jesterworks():
 
         #print("\tWriting To File... ")
         #OutputTree.SetDirectory(0)
+        threadLock.acquire()
         OutputFile.cd()
         OutputTree.Write()
         if(self.GrabHistos or self.AltGrabHistos):
@@ -469,6 +469,7 @@ class Jesterworks():
             EventCounterWeights.Write()
         OutputFile.Write()
         OutputFile.Close()
+        threadLock.release()
 
         threadLock.acquire()
         TheWindow.move(1,1)
@@ -507,10 +508,10 @@ class Jesterworks():
                     TheWindow.erase()
                     TheWindow.addstr(1,1,"ERROR!", curses.color_pair(1)|curses.A_BOLD)
                     TheWindow.box()
-                    TheWindow.refresh()
-                    
+                    TheWindow.refresh()                    
                     logging.warning("File failed.")
                     logging.debug(FilePath)
+                    logging.debug("Index Number: "+str(IndexNum))
                     threadLock.release()
                                 
         
