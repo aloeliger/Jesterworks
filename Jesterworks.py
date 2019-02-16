@@ -186,12 +186,18 @@ class Jesterworks():
         baseWin = curses.newwin(4,TermColumns-2,TermRows-4,0)        
         baseWin.box()
         baseWin.refresh()
+
+        NumThreads = 1
+        if(WorkQueue.qsize() < 6):
+            NumThreads = WorkQueue.qsize()
+        else:
+            NumThreads = 6
         
         ThreadWindows = []
-        WindowIncrement = (TermRows-4)/6
+        WindowIncrement = (TermRows-4)/NumThreads
         
         threadLock.acquire()        
-        for i in range(6):
+        for i in range(NumThreads):
             ThreadWindows.append(curses.newwin(WindowIncrement,
                                                TermColumns-2,
                                                i*WindowIncrement,
@@ -209,7 +215,9 @@ class Jesterworks():
             
             queueLock.acquire()
             threadLock.acquire()        
-            baseWin.addstr(1,1,str(WorkQueue.qsize())+" Files remaining in queue")
+            baseWin.addstr(1,1,str(WorkQueue.qsize())+" Files remaining in queue,")
+            baseWin.addstr(1,1+len(str(WorkQueue.qsize())+" Files remaining in queue,")+1,
+                           "Configuration: "+sys.argv[1])
             baseWin.refresh()
             threadLock.release()
             queueLock.release()
@@ -218,6 +226,8 @@ class Jesterworks():
             queueLock.acquire()
             threadLock.acquire()        
             baseWin.addstr(1,1,str(WorkQueue.qsize())+" Files remaining in queue")
+            baseWin.addstr(1,1+len(str(WorkQueue.qsize())+" Files remaining in queue,")+1,
+                           "Configuration: "+sys.argv[1])
             baseWin.refresh()
             threadLock.release()
             queueLock.release()
@@ -298,6 +308,10 @@ class Jesterworks():
                 Value = array('f',[0.])                
                 OutputTree.Branch(Branch.GetName(),Value,Branch.GetName()+"/F")
                 OutputTreeDictionary[Branch.GetName()] = Value                
+                
+        #try and hard set the tree directory to the file top level
+        #see if this fixes thread issues of closing files and losing trees
+        OutputTree.SetDirectory(OutputFile.GetDirectory(""))
         #cancelations:
         
         threadLock.acquire()
@@ -371,7 +385,7 @@ class Jesterworks():
         #via passed function.    
         PreferedRLE = ''
         FirstAcceptedEvent = True
-        for i in range(InputChain.GetEntries()):            
+        for i in range(InputChain.GetEntries()):                        
             InputChain.GetEntry(i)            
             if self.SkimEvalFunction(InputChain,self.SampleName):
                 #Good event. Automatically fill The new event dictionary.
@@ -393,7 +407,8 @@ class Jesterworks():
                 elif(GetRLECode(InputChain) != PreferedRLE and not FirstAcceptedEvent):                    
                     for key in OldEventDictionary:                        
                         OutputTreeDictionary[key][0] = OldEventDictionary[key]                        
-                    OutputTree.Fill()                       
+                    OutputTree.Fill()                                                                   
+                    
                     PreferedRLE = GetRLECode(InputChain)
                     OldEventDictionary = NewEventDictionary
             else:                
@@ -468,7 +483,7 @@ class Jesterworks():
         if(self.GrabHistos):            
             EventCounterWeights.Write()
         OutputFile.Write()
-        OutputFile.Close()
+        #OutputFile.Close()
         threadLock.release()
 
         threadLock.acquire()
@@ -476,7 +491,7 @@ class Jesterworks():
         TheWindow.insertln()
         TheWindow.addstr(1,1,"Done Performing Skim!",curses.color_pair(2) | curses.A_BLINK)
         TheWindow.box()
-        TheWindow.refresh()
+        TheWindow.refresh()        
         threadLock.release()
 
     def ThreadHandle(self,TheWindow):
@@ -512,6 +527,7 @@ class Jesterworks():
                     logging.warning("File failed.")
                     logging.debug(FilePath)
                     logging.debug("Index Number: "+str(IndexNum))
+                    logging.exception("Reported Error: ")
                     threadLock.release()
                                 
         
