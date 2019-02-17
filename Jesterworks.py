@@ -432,9 +432,9 @@ class Jesterworks():
             
             InitialFile = ROOT.TFile(self.InputFiles[0],"READ")
             EventCounter = InitialFile.Get(self.Channel+AdditionalSlash+"eventCount").Clone()
-            EventCounter.SetDirectory(0)
+            EventCounter.SetDirectory(OutputFile.GetDirectory(""))
             EventCounterWeights = InitialFile.Get(self.Channel+AdditionalSlash+"summedWeights").Clone()
-            EventCounterWeights.SetDirectory(0)            
+            EventCounterWeights.SetDirectory(OutputFile.GetDirectory(""))            
             InitialFile.Close()        
             #for i in range(1,len(self.InputFiles)):
             #    TheFile = ROOT.TFile(self.InputFiles[i],"READ")
@@ -453,7 +453,7 @@ class Jesterworks():
 
             InitialFile = ROOT.TFile(self.InputFiles[0],"READ")
             EventCounter = InitialFile.Get("nevents").Clone()
-            EventCounter.SetDirectory(0)
+            EventCounter.SetDirectory(OutputFile.GetDirectory(""))
             InitialFile.Close()
             for i in range(1,len(self.InputFiles)):
                 TheFile = ROOT.TFile(self.InputFiles[i],"READ")
