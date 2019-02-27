@@ -186,7 +186,7 @@ class Jesterworks():
         baseWin.refresh()
 
         NumThreads = 1
-        if(WorkQueue.qsize() < 6):
+        if(WorkQueue.qsize() < 6 and WorkQueue.qsize() > 0):
             NumThreads = WorkQueue.qsize()
         else:
             NumThreads = 6
@@ -321,6 +321,7 @@ class Jesterworks():
 
         for Item in self.CancelationList:
             OutputTree.GetBranch(Item).SetStatus(0)
+            InputChain.GetBranch(Item).SetStatus(0)
 
         #precutting, hopefully speeds up skims
         #the cut string provided shouldn't need to access the full tree
@@ -468,7 +469,11 @@ class Jesterworks():
         threadLock.release()
         
         for key in self.RenameDictionary:            
-            OutputTree.GetBranch(key).SetNameTitle(self.RenameDictionary[key],self.RenameDictionary[key])
+            try:
+                OutputTree.GetBranch(key).SetNameTitle(self.RenameDictionary[key],self.RenameDictionary[key])
+            except:
+                logging.warning("Rename Failed:")
+                logging.warning("Attempting to rename branch: "+str(key))
 
         #print("\tWriting To File... ")
         #OutputTree.SetDirectory(0)
@@ -480,7 +485,7 @@ class Jesterworks():
         if(self.GrabHistos):            
             EventCounterWeights.Write()
         OutputFile.Write()
-        #OutputFile.Close()
+        OutputFile.Close()
         threadLock.release()
 
         threadLock.acquire()
@@ -525,7 +530,12 @@ class Jesterworks():
                     logging.debug(FilePath)
                     logging.debug("Index Number: "+str(IndexNum))
                     logging.exception("Reported Error: ")
+                    logging.info("Putting it back into the rotation...")
                     threadLock.release()
+                    queueLock.acquire()
+                    WorkQueue.put(FilePath)
+                    IDQueue.put(IndexNum)
+                    queueLock.release()
                                 
         
     
