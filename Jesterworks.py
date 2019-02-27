@@ -177,9 +177,7 @@ class Jesterworks():
         curses.init_pair(1,curses.COLOR_RED, curses.COLOR_BLACK)
         curses.init_pair(2,curses.COLOR_GREEN, curses.COLOR_BLACK)
 
-        TermRows, TermColumns = os.popen('stty size','r').read().split()
-        TermRows = int(TermRows)
-        TermColumns = int(TermColumns)
+        TermRows, TermColumns = stdscr.getmaxyx()
         queueLock.release()
         stdscr.clear()
         stdscr.refresh()
@@ -209,10 +207,8 @@ class Jesterworks():
             self.Threads.append(TheThread)        
         threadLock.release()
 
-
         #main loop while threads process...        
         while not WorkQueue.empty():
-            
             queueLock.acquire()
             threadLock.acquire()        
             baseWin.addstr(1,1,str(WorkQueue.qsize())+" Files remaining in queue,")
@@ -231,7 +227,8 @@ class Jesterworks():
             baseWin.refresh()
             threadLock.release()
             queueLock.release()
-        
+            
+
         for i in range(len(self.Threads)):
             self.Threads[i].join()            
             
