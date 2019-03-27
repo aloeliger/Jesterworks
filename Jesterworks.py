@@ -320,8 +320,13 @@ class Jesterworks():
         threadLock.release()
 
         for Item in self.CancelationList:
-            OutputTree.GetBranch(Item).SetStatus(0)
-            InputChain.GetBranch(Item).SetStatus(0)
+            try:
+                OutputTree.GetBranch(Item).SetStatus(0)
+                InputChain.GetBranch(Item).SetStatus(0)
+            except:
+                logging.warning("Couldn't cancel branch: ")
+                logging.warning("Branch: "+str(Item))
+                   
 
         #precutting, hopefully speeds up skims
         #the cut string provided shouldn't need to access the full tree
