@@ -7,6 +7,7 @@ def TauIDSkim(TheEvent,SampleName=""):
     MuVector = ROOT.TLorentzVector()
     TauVector.SetPtEtaPhiM(TheEvent.tPt,TheEvent.tEta,TheEvent.tPhi,TheEvent.tMass)
     MuVector.SetPtEtaPhiM(TheEvent.mPt,TheEvent.mEta,TheEvent.mPhi,TheEvent.mMass)
+
     if(TheEvent.IsoMu27Pass
        and TheEvent.m_t_DR>0.5
        and MuVector.Pt() > 28 
