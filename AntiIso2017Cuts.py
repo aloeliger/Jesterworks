@@ -31,8 +31,6 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
 
     Trigger24 = (TheEvent.passMu24 and TheEvent.matchMu24_1 
                  and TheEvent.filterMu24_1 and TheEvent.pt_1 > 25.0)
-
-    """
     Trigger27 = (TheEvent.passMu27 and TheEvent.matchMu27_1 
                  and TheEvent.filterMu27_1 and TheEvent.pt_1 > 28.0)
     Trigger2027 = (TheEvent.passMu20Tau27 and TheEvent.matchMu20Tau27_1 
@@ -48,11 +46,10 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
                        and TheEvent.pt_1 > 21 and TheEvent.pt_2 > 31 
                        and TheEvent.pt_1 < 25
                        and abs(TheEvent.eta_2 < 2.1))
-    """
-    if(not Trigger24): #and not Trigger27 and not Trigger2027):
+    if(not Trigger24 and not Trigger27 and not Trigger2027):
         isGoodEvent = False
 
-    if(not TheEvent.againstElectronLooseMVA6_2 or not TheEvent.againstMuonTight3_2):
+    if(not TheEvent.againstElectronVLooseMVA6_2 or not TheEvent.againstMuonTight3_2):
         isGoodEvent = False
 
     #Cecile has some weird stuff here.
@@ -69,25 +66,26 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
     if(TheEvent.pt_2 < 20):
         isGoodEvent = False
 
-    #if(SampleName == "DY" and TheEvent.gen_match_2 == 5):
-    #    isGoodEvent = False
-    
-    #due to JES effect, applied on a case by case basis
+    if(SampleName == "DY" and TheEvent.gen_match_2 == 5):
+        isGoodEvent = False    
+#Due to JES, applied on a case by case basis
     #MT = math.sqrt(2.0*MuonVector.Pt()*METVector.Pt()*(1.0-math.cos(MuonVector.DeltaPhi(METVector))))
-    
+        
     #if(MT > 50.0):
     #    isGoodEvent = False
 
     if (TheEvent.q_1*TheEvent.q_2 > 0):
         isGoodEvent = False
 
-    #anti-isolation definition
+    #need a signal region definition.
+    signalRegion = (TheEvent.byTightIsolationMVArun2v2DBoldDMwLT_2 and TheEvent.iso_1 < 0.15)
+    
     antiIsolated = (TheEvent.byVLooseIsolationMVArun2v2DBoldDMwLT_2 
                     and not TheEvent.byTightIsolationMVArun2v2DBoldDMwLT_2
                     and TheEvent.iso_1 < 0.15)
     
     if(not antiIsolated):
-        isGoodEvent = False
+        isGoodEvent = False        
 
     return isGoodEvent
 

@@ -457,12 +457,19 @@ class Jesterworks():
             InitialFile = ROOT.TFile(self.InputFiles[0],"READ")
             EventCounter = InitialFile.Get("nevents").Clone()
             EventCounter.SetDirectory(OutputFile.GetDirectory(""))
-            InitialFile.Close()
             for i in range(1,len(self.InputFiles)):
                 TheFile = ROOT.TFile(self.InputFiles[i],"READ")
                 EventCounter.Add(TheFile.Get("nevents"))
                 TheFile.Close()
             EventCounter.SetNameTitle("eventCount","eventCount")
+            
+            PileupHistogram = InitialFile.Get("pileup_mc").Clone()
+            PileupHistogram.SetDirectory(OutputFile.GetDirectory(""))
+            for i in range(1,len(self.InputFiles)):
+                TheFile = ROOT.TFile(self.InputFiles[i],"READ")
+                PileupHistogram.Add(TheFile.Get("pileup_mc"))
+                TheFile.Close()
+            InitialFile.Close()
             
         #Post skim
         threadLock.acquire()
@@ -489,6 +496,8 @@ class Jesterworks():
             EventCounter.Write()
         if(self.GrabHistos):            
             EventCounterWeights.Write()
+        if(self.AltGrabHistos):
+            PileupHistogram.Write()
         OutputFile.Write()
         OutputFile.Close()
         threadLock.release()

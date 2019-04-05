@@ -66,16 +66,16 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
     if(TheEvent.nbtag>0):
         isGoodEvent = False
 
-    if(TheEvent.pt_2 < 20 or (TheEvent.njets > 0 and TheEvent.pt_2 < 30)):
+    if(TheEvent.pt_2 < 20):
         isGoodEvent = False
 
     #if(SampleName == "DY" and TheEvent.gen_match_2 == 5):
     #    isGoodEvent = False
+    #
+    #MT = math.sqrt(2.0*MuonVector.Pt()*METVector.Pt()*(1.0-math.cos(MuonVector.DeltaPhi(METVector))))
     
-    MT = math.sqrt(2.0*MuonVector.Pt()*METVector.Pt()*(1.0-math.cos(MuonVector.DeltaPhi(MuonVector))))
-    
-    if(MT > 50.0):
-        isGoodEvent = False
+    #if(MT > 50.0):
+    #    isGoodEvent = False
 
     if (TheEvent.q_1*TheEvent.q_2 > 0):
         isGoodEvent = False
