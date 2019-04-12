@@ -66,7 +66,12 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
     if(TheEvent.pt_2 < 20):
         isGoodEvent = False
 
-    if(SampleName == "DY" and TheEvent.gen_match_2 == 5):
+    #no overlap with embedded.
+    if((SampleName == "DY" 
+        or SampleName == "TT"
+        or SampleName == "EWKZLL"
+        or SampleName == "VV")
+       and TheEvent.gen_match_2 == 5):
         isGoodEvent = False
     
     #this may need to change since met and metphi change with JES
