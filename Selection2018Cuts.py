@@ -19,7 +19,7 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
         
     if(TheEvent.flag_goodVertices
        or TheEvent.flag_goodVertices
-       or TheEvent.flag_globalTightHalo2016
+       or TheEvent.flag_globalSuperTightHalo2016
        or TheEvent.flag_HBHENoise
        or TheEvent.flag_HBHENoiseIso
        or TheEvent.flag_EcalDeadCellTriggerPrimitive
@@ -31,6 +31,27 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
 
     Trigger24 = (TheEvent.passMu24 and TheEvent.matchMu24_1 
                  and TheEvent.filterMu24_1 and TheEvent.pt_1 > 25.0)
+    if SampleName == "data_obs":
+        if (TheEvent.run >= 317509): #hps trigger, no filter
+            Trigger2027 = (TheEvent.passMu20HPSTau27 
+                           and TheEvent.matchMu20HPSTau27_1
+                           and TheEvent.matchMu20HPSTau27_2
+                           and TheEvent.pt_1 > 21 and TheEvent.pt_1 < 25
+                           and TheEvent.pt_2 > 28)
+        if (TheEvent.run < 317509): #non hps trigger, can filter
+            Trigger2027 = (TheEvent.passMu20Tau27 
+                           and TheEvent.matchMu20Tau27_1
+                           and TheEvent.matchMu20Tau27_2
+                           and TheEvent.pt_1 > 21 and TheEvent.pt_1 < 25
+                           and TheEvent.pt_2 > 28
+                           and TheEvent.filterMu20Tau27_1
+                           and TheEvent.filterMu20Tau27_2)
+    else: #all hps cross trigger, ignore HPS filters
+        Trigger2027 = (TheEvent.passMu20HPSTau27 
+                       and TheEvent.matchMu20HPSTau27_1
+                       and TheEvent.matchMu20HPSTau27_2
+                       and TheEvent.pt_1 > 21 and TheEvent.pt_1 < 25
+                       and TheEvent.pt_2 > 28)
 
     """
     Trigger27 = (TheEvent.passMu27 and TheEvent.matchMu27_1 
@@ -49,7 +70,7 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
                        and TheEvent.pt_1 < 25
                        and abs(TheEvent.eta_2 < 2.1))
     """
-    if(not Trigger24): #and not Trigger27 and not Trigger2027):
+    if(not (Trigger24 or Trigger2027)): #and not Trigger27 and not Trigger2027):
         isGoodEvent = False
 
     if(not TheEvent.againstElectronLooseMVA6_2 or not TheEvent.againstMuonTight3_2):
