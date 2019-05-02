@@ -38,14 +38,16 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
                    and TheEvent.filterMu20Tau27_2
                    and TheEvent.pt_1 > 21 and TheEvent.pt_2 > 31 
                    and TheEvent.pt_1 < 25
-                   and abs(TheEvent.eta_2 < 2.1))
+                   and abs(TheEvent.eta_1) < 2.1
+                   and abs(TheEvent.eta_2) < 2.1)
     #no tau trigger matching in embedded
     if(SampleName == "embedded"):
         Trigger2027 = (TheEvent.passMu20Tau27 and TheEvent.matchMu20Tau27_1 
                        and TheEvent.filterMu20Tau27_1
                        and TheEvent.pt_1 > 21 and TheEvent.pt_2 > 31 
                        and TheEvent.pt_1 < 25
-                       and abs(TheEvent.eta_2 < 2.1))
+                       and abs(TheEvent.eta_1) < 2.1
+                       and abs(TheEvent.eta_2) < 2.1)
     if(not Trigger24 and not Trigger27 and not Trigger2027):
         isGoodEvent = False
 
@@ -72,6 +74,9 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
         or SampleName == "EWKZLL"
         or SampleName == "VV")
        and TheEvent.gen_match_2 == 5):
+        isGoodEvent = False
+    #nooverlap with FFs
+    if(not (SampleName == "embedded") and TheEvent.gen_match_2 == 6):
         isGoodEvent = False
     
     #this may need to change since met and metphi change with JES
