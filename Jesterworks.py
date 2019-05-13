@@ -164,7 +164,7 @@ class Jesterworks():
 
     #the most central function after a run call
     def GenerateThreads(self,stdscr):        
-        logging.basicConfig(filename=self.OutFileName+"_Err.log",level=logging.DEBUG)
+        logging.basicConfig(filename=self.OutFileName+"_Err.log",filemode="w",level=logging.DEBUG)
         print("Generating the list of threads...")        
         queueLock.acquire()
         print("Generating Queues...")
