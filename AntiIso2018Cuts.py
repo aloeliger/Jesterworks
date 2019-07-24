@@ -24,9 +24,8 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
        or TheEvent.flag_HBHENoise
        or TheEvent.flag_HBHENoiseIso
        or TheEvent.flag_EcalDeadCellTriggerPrimitive
-       or TheEvent.flag_BadPFMuon
-       #or TheEvent.flag_BadChargedCandidate
-       or SampleName == "data_obs" and TheEvent.flag_eeBadSc
+       or TheEvent.flag_BadPFMuon       
+       or TheEvent.flag_eeBadSc
        or TheEvent.flag_ecalBadCalib):
         isGoodEvent = False
 
