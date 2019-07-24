@@ -18,14 +18,13 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
         isGoodEvent = False
         
     if(TheEvent.flag_goodVertices
-       or TheEvent.flag_goodVertices
-       or TheEvent.flag_globalTightHalo2016
+       or TheEvent.flag_globalSuperTightHalo2016
        or TheEvent.flag_HBHENoise
        or TheEvent.flag_HBHENoiseIso
        or TheEvent.flag_EcalDeadCellTriggerPrimitive
        or TheEvent.flag_BadPFMuon
        or TheEvent.flag_BadChargedCandidate
-       or SampleName == "data_obs" and TheEvent.flag_eeBadSc
+       or TheEvent.flag_eeBadSc
        or TheEvent.flag_ecalBadCalib):
         isGoodEvent = False
 
@@ -69,18 +68,20 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
         isGoodEvent = False
 
     #no overlap with embedded
+    """
     if((SampleName == "DY" 
         or SampleName == "TT"
         or SampleName == "EWKZLL"
         or SampleName == "VV") 
        and TheEvent.gen_match_2 == 5):
         isGoodEvent = False    
+    """
     #nooverlap with FFs
     #NVM THAT,need these in the anti isolated region:
     #if(not (SampleName == "embedded") and TheEvent.gen_match_2 == 6):
     #    isGoodEvent = False
 
-#Due to JES, applied on a case by case basis
+    #Due to JES, applied on a case by case basis
     #MT = math.sqrt(2.0*MuonVector.Pt()*METVector.Pt()*(1.0-math.cos(MuonVector.DeltaPhi(METVector))))
         
     #if(MT > 50.0):

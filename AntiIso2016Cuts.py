@@ -21,17 +21,11 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
         isGoodEvent = False
 
     if(TheEvent.flag_goodVertices
-       or TheEvent.flag_globalSuperTightHalo2016
-       or TheEvent.flag_eeBadSc
-       or SampleName == "data_ovs" and TheEvent.flag_eeBadSc
-       or TheEvent.flag_ecalBadCalib
-       or TheEvent.flag_badMuons
-       or TheEvent.flag_duplicateMuons
+       or TheEvent.flag_globalSuperTightHalo2016       
        or TheEvent.flag_HBHENoiseIso
        or TheEvent.flag_HBHENoise
        or TheEvent.flag_EcalDeadCellTriggerPrimitive
-       or TheEvent.flag_BadPFMuon
-       or TheEvent.flag_BadChargedCandidate):
+       or TheEvent.flag_BadPFMuon):
         isGoodEvent = False
         
     Trigger22 = (TheEvent.pt_1 >23.0 and abs(TheEvent.eta_1)<2.1 

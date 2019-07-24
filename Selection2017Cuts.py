@@ -17,15 +17,14 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
     if(abs(TheEvent.eta_1) > 2.1 or abs(TheEvent.eta_2) > 2.3):
         isGoodEvent = False
         
-    if(TheEvent.flag_goodVertices
-       or TheEvent.flag_goodVertices
-       or TheEvent.flag_globalTightHalo2016
+    if(TheEvent.flag_goodVertices       
+       or TheEvent.flag_globalSuperTightHalo2016
        or TheEvent.flag_HBHENoise
        or TheEvent.flag_HBHENoiseIso
        or TheEvent.flag_EcalDeadCellTriggerPrimitive
        or TheEvent.flag_BadPFMuon
        or TheEvent.flag_BadChargedCandidate
-       or SampleName == "data_obs" and TheEvent.flag_eeBadSc
+       or TheEvent.flag_eeBadSc
        or TheEvent.flag_ecalBadCalib):
         isGoodEvent = False
 
@@ -69,12 +68,14 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
         isGoodEvent = False
 
     #no overlap with embedded.
+    """
     if((SampleName == "DY" 
         or SampleName == "TT"
         or SampleName == "EWKZLL"
         or SampleName == "VV")
        and TheEvent.gen_match_2 == 5):
         isGoodEvent = False
+    """
     #nooverlap with FFs
     if(not (SampleName == "embedded") and TheEvent.gen_match_2 == 6):
         isGoodEvent = False
