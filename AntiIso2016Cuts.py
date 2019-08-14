@@ -20,13 +20,22 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
     if(TheEvent.pt_1 < 20.0 or TheEvent.pt_2 < 20.0):
         isGoodEvent = False
 
-    if(TheEvent.flag_goodVertices
-       or TheEvent.flag_globalSuperTightHalo2016       
-       or TheEvent.flag_HBHENoiseIso
-       or TheEvent.flag_HBHENoise
-       or TheEvent.flag_EcalDeadCellTriggerPrimitive
-       or TheEvent.flag_BadPFMuon):
-        isGoodEvent = False
+    if SampleName=="ggH":
+        if(TheEvent.Flag_goodVertices
+           or TheEvent.Flag_globalSuperTightHalo2016Filter              
+           or TheEvent.Flag_HBHENoiseIsoFilter
+           or TheEvent.Flag_HBHENoiseFilter
+           or TheEvent.Flag_EcalDeadCellTriggerPrimitiveFilter
+           or TheEvent.Flag_BadPFMuonFilter):
+            isGoodEvent = False
+    else:
+        if(TheEvent.flag_goodVertices
+           or TheEvent.flag_globalSuperTightHalo2016              
+           or TheEvent.flag_HBHENoiseIso
+           or TheEvent.flag_HBHENoise
+           or TheEvent.flag_EcalDeadCellTriggerPrimitive
+           or TheEvent.flag_BadPFMuon):
+            isGoodEvent = False
         
     Trigger22 = (TheEvent.pt_1 >23.0 and abs(TheEvent.eta_1)<2.1 
                  and ((TheEvent.passMu22eta2p1 and TheEvent.matchMu22eta2p1_1 and TheEvent.filterMu22eta2p1_1) 
@@ -49,8 +58,8 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
         isGoodEvent = False
         
     antiIsolated = (TheEvent.byVLooseIsolationMVArun2v2DBoldDMwLT_2 
-                    and not (TheEvent.byTightIsolationMVArun2v2DBoldDMwLT_2
-                    and TheEvent.iso_1 < 0.15))
+                    and not TheEvent.byTightIsolationMVArun2v2DBoldDMwLT_2
+                    and TheEvent.iso_1 < 0.15)
 
     if(not antiIsolated):
         isGoodEvent = False
