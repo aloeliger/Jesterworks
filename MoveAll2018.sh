@@ -6,7 +6,7 @@ mv SMHTT2018SelectionConfigs/DY.root $1/DY.root
 mv SMHTT2018SelectionConfigs/Data_0.root $1/Data.root
 mv SMHTT2018SelectionConfigs/EWKZLL_0.root $1/EWKZLL.root
 mv SMHTT2018SelectionConfigs/EWKZNuNu_0.root $1/EWKZNuNu.root
-#mv SMHTT2018SelectionConfigs/Embedded_0.root $1/Embedded.root
+mv SMHTT2018SelectionConfigs/Embedded_0.root $1/Embedded.root
 mv SMHTT2018SelectionConfigs/ST_tW_antitop_0.root $1/ST_tW_antitop.root
 mv SMHTT2018SelectionConfigs/ST_tW_top_0.root $1/ST_tW_top.root
 mv SMHTT2018SelectionConfigs/ST_t_antitop_0.root $1/ST_t_antitop.root
