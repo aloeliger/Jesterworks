@@ -17,16 +17,15 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
     if(abs(TheEvent.eta_1) > 2.1 or abs(TheEvent.eta_2) > 2.3):
         isGoodEvent = False
         
-    if(TheEvent.flag_goodVertices
-       or TheEvent.flag_goodVertices
-       or TheEvent.flag_globalTightHalo2016
-       or TheEvent.flag_HBHENoise
-       or TheEvent.flag_HBHENoiseIso
-       or TheEvent.flag_EcalDeadCellTriggerPrimitive
-       or TheEvent.flag_BadPFMuon
-       or TheEvent.flag_BadChargedCandidate
-       or SampleName == "data_obs" and TheEvent.flag_eeBadSc
-       or TheEvent.flag_ecalBadCalib):
+    if(TheEvent.Flag_goodVertices       
+       or TheEvent.Flag_globalSuperTightHalo2016Filter
+       or TheEvent.Flag_HBHENoiseFilter
+       or TheEvent.Flag_HBHENoiseIsoFilter
+       or TheEvent.Flag_EcalDeadCellTriggerPrimitiveFilter
+       or TheEvent.Flag_BadPFMuonFilter
+       or TheEvent.Flag_BadChargedCandidateFilter
+       or TheEvent.Flag_eeBadScFilter
+       or TheEvent.Flag_ecalBadCalibFilter):
         isGoodEvent = False
 
     Trigger24 = (TheEvent.passMu24 and TheEvent.matchMu24_1 
@@ -41,11 +40,14 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
                    and abs(TheEvent.eta_2 < 2.1))
     #no tau trigger matching in embedded
     if(SampleName == "embedded"):
-        Trigger2027 = (TheEvent.passMu20Tau27 and TheEvent.matchMu20Tau27_1 
-                       and TheEvent.filterMu20Tau27_1
-                       and TheEvent.pt_1 > 21 and TheEvent.pt_2 > 31 
-                       and TheEvent.pt_1 < 25
-                       and abs(TheEvent.eta_2 < 2.1))
+        Trigger2027 = (#TheEvent.passMu20Tau27 
+            #and TheEvent.matchMu20Tau27_1             
+            #and TheEvent.filterMu20Tau27_1
+            #and TheEvent.pt_1 > 21 and TheEvent.pt_2 > 31 
+            TheEvent.pt_1 > 21 and TheEvent.pt_2 > 31 
+            and TheEvent.pt_1 < 25
+            and abs(TheEvent.eta_1) < 2.1
+            and abs(TheEvent.eta_2) < 2.1)
     if(not Trigger24 and not Trigger27 and not Trigger2027):
         isGoodEvent = False
 
