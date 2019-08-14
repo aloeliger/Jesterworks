@@ -17,22 +17,24 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
     if(abs(TheEvent.eta_1) > 2.1 or abs(TheEvent.eta_2) > 2.3):
         isGoodEvent = False
         
-    if(TheEvent.flag_goodVertices
-       or TheEvent.flag_globalSuperTightHalo2016
-       or TheEvent.flag_HBHENoise
-       or TheEvent.flag_HBHENoiseIso
-       or TheEvent.flag_EcalDeadCellTriggerPrimitive
-       or TheEvent.flag_BadPFMuon
-       or TheEvent.flag_BadChargedCandidate
-       or TheEvent.flag_eeBadSc
-       or TheEvent.flag_ecalBadCalib):
+    if(TheEvent.Flag_goodVertices       
+       or TheEvent.Flag_globalSuperTightHalo2016Filter
+       or TheEvent.Flag_HBHENoiseFilter
+       or TheEvent.Flag_HBHENoiseIsoFilter
+       or TheEvent.Flag_EcalDeadCellTriggerPrimitiveFilter
+       or TheEvent.Flag_BadPFMuonFilter
+       or TheEvent.Flag_BadChargedCandidateFilter
+       or TheEvent.Flag_eeBadScFilter
+       or TheEvent.Flag_ecalBadCalibFilter):
         isGoodEvent = False
 
     Trigger24 = (TheEvent.passMu24 and TheEvent.matchMu24_1 
                  and TheEvent.filterMu24_1 and TheEvent.pt_1 > 25.0)
     Trigger27 = (TheEvent.passMu27 and TheEvent.matchMu27_1 
                  and TheEvent.filterMu27_1 and TheEvent.pt_1 > 28.0)
-    Trigger2027 = (TheEvent.passMu20Tau27 and TheEvent.matchMu20Tau27_1 
+    Trigger2027 = (TheEvent.passMu20Tau27 
+                   and TheEvent.matchMu20Tau27_1 
+                   and TheEvent.matchMu20Tau27_2
                    and TheEvent.filterMu20Tau27_1                    
                    and TheEvent.filterMu20Tau27_2
                    and TheEvent.pt_1 > 21 and TheEvent.pt_2 > 31 
@@ -41,12 +43,14 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
                    and abs(TheEvent.eta_2) < 2.1)
     #no tau trigger matching in embedded
     if(SampleName == "embedded"):
-        Trigger2027 = (TheEvent.passMu20Tau27 and TheEvent.matchMu20Tau27_1 
-                       and TheEvent.filterMu20Tau27_1
-                       and TheEvent.pt_1 > 21 and TheEvent.pt_2 > 31 
-                       and TheEvent.pt_1 < 25
-                       and abs(TheEvent.eta_1) < 2.1
-                       and abs(TheEvent.eta_2) < 2.1)
+        Trigger2027 = (#TheEvent.passMu20Tau27 
+                       #and TheEvent.matchMu20Tau27_1 
+                       #asnd TheEvent.filterMu20Tau27_1
+                       #and TheEvent.pt_1 > 21 and TheEvent.pt_2 > 31 
+            TheEvent.pt_1 > 21 and TheEvent.pt_2 > 31 
+            and TheEvent.pt_1 < 25
+            and abs(TheEvent.eta_1) < 2.1
+            and abs(TheEvent.eta_2) < 2.1)
     if(not Trigger24 and not Trigger27 and not Trigger2027):
         isGoodEvent = False
 
@@ -68,25 +72,12 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
         isGoodEvent = False
 
     #no overlap with embedded
-    """
     if((SampleName == "DY" 
-        or SampleName == "TT"
-        or SampleName == "EWKZLL"
+        or SampleName == "TT"    
         or SampleName == "VV") 
-       and TheEvent.gen_match_2 == 5):
-        isGoodEvent = False    
-    """
-    #nooverlap with FFs
-    #NVM THAT,need these in the anti isolated region:
-    #if(not (SampleName == "embedded") and TheEvent.gen_match_2 == 6):
-    #    isGoodEvent = False
-
-    #Due to JES, applied on a case by case basis
-    #MT = math.sqrt(2.0*MuonVector.Pt()*METVector.Pt()*(1.0-math.cos(MuonVector.DeltaPhi(METVector))))
-        
-    #if(MT > 50.0):
-    #    isGoodEvent = False
-
+       and (TheEvent.gen_match_1 > 2 and TheEvent.gen_match_1 < 6 and TheEvent.gen_match_2 > 2 and TheEvent.gen_match_2 < 6)):
+        isGoodEvent = False                
+    
     if (TheEvent.q_1*TheEvent.q_2 > 0):
         isGoodEvent = False
 
