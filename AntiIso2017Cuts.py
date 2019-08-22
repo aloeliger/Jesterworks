@@ -31,7 +31,7 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
     Trigger24 = (TheEvent.passMu24 and TheEvent.matchMu24_1 
                  and TheEvent.filterMu24_1 and TheEvent.pt_1 > 25.0)
     Trigger27 = (TheEvent.passMu27 and TheEvent.matchMu27_1 
-                 and TheEvent.filterMu27_1 and TheEvent.pt_1 > 28.0)
+                 and TheEvent.filterMu27_1 and TheEvent.pt_1 > 25.0)
     Trigger2027 = (TheEvent.passMu20Tau27 
                    and TheEvent.matchMu20Tau27_1 
                    and TheEvent.matchMu20Tau27_2
