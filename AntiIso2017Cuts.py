@@ -2,6 +2,7 @@ import ROOT
 import sys
 from Jesterworks import Jesterworks
 import math
+import argparse
 
 def HTTSelectionCuts(TheEvent, SampleName = ""):
     isGoodEvent = True
@@ -31,7 +32,7 @@ def HTTSelectionCuts(TheEvent, SampleName = ""):
     Trigger24 = (TheEvent.passMu24 and TheEvent.matchMu24_1 
                  and TheEvent.filterMu24_1 and TheEvent.pt_1 > 25.0)
     Trigger27 = (TheEvent.passMu27 and TheEvent.matchMu27_1 
-                 and TheEvent.filterMu27_1 and TheEvent.pt_1 > 28.0)
+                 and TheEvent.filterMu27_1 and TheEvent.pt_1 > 25.0)
     Trigger2027 = (TheEvent.passMu20Tau27 
                    and TheEvent.matchMu20Tau27_1 
                    and TheEvent.matchMu20Tau27_2
@@ -99,7 +100,18 @@ def TrivialPriority(NewEventDictionary,OldEventDictionary):
     return True
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Jesterworks driven 2017 Anti-Iso Selections")
+    parser.add_argument('ConfFiles',nargs="+",help="The files to perform the cuts for")
+    
+    args = parser.parse_args()
+    
+    for ConfFile in args.ConfFiles:
+        TheSkim = Jesterworks(ConfFile,HTTSelectionCuts,TrivialPriority)
+        TheSkim.CreateListOfFilesToRunOn()
+        TheSkim.Run()
+    """
     ConfFile  =sys.argv[1]
     TheSkim = Jesterworks(ConfFile,HTTSelectionCuts,TrivialPriority)
     TheSkim.CreateListOfFilesToRunOn()
     TheSkim.Run()
+    """

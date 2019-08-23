@@ -2,6 +2,7 @@ import ROOT
 import sys
 from Jesterworks import Jesterworks
 import math
+import argparse
 
 def HTTSelectionCuts(TheEvent, SampleName = ""):
     isGoodEvent = True
@@ -71,7 +72,19 @@ def TrivialPriority(NewEventDictionary,OldEventDictionary):
     return True
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Jesterworks driven 2016 Selections")
+    parser.add_argument('ConfFiles',nargs="+",help="The files to perform the cuts for")
+    
+    args = parser.parse_args()
+    
+    for ConfFile in args.ConfFiles:
+        TheSkim = Jesterworks(ConfFile,HTTSelectionCuts,TrivialPriority)
+        TheSkim.CreateListOfFilesToRunOn()
+        TheSkim.Run()
+        
+    """
     ConfFile  =sys.argv[1]
     TheSkim = Jesterworks(ConfFile,HTTSelectionCuts,TrivialPriority)
     TheSkim.CreateListOfFilesToRunOn()
     TheSkim.Run()
+    """
