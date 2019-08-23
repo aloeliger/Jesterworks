@@ -24,8 +24,8 @@ if __name__ == "__main__":
         OutputFile = ROOT.TFile(TheConfig.OutputPath+TheConfig.OutputFile,"RECREATE")
         #get a chain and compress it into a tree
         TheChain = ROOT.TChain(TheConfig.InputTreeName)
-        for File in TheConfig.Files:
-            TheChain.Add(TheConfig.Path+File)
+        for File in TheConfig.ReturnCompleteListOfFiles():
+            TheChain.Add(File)
         TheChain = TheChain.CopyTree("")
         #add on any extra branches we need
         TheConfig.BranchCollection.PrepCollection(TheChain)
