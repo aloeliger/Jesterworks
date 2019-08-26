@@ -28,10 +28,14 @@ if __name__ == "__main__":
             TheChain.Add(File)
         TheChain = TheChain.CopyTree("")
         #add on any extra branches we need
-        TheConfig.BranchCollection.PrepCollection(TheChain)
-        TheConfig.BranchCollection.AddBranches(TheChain)
+        if TheConfig.BranchCollection != None:
+            TheConfig.BranchCollection.PrepCollection(TheChain)
+            TheConfig.BranchCollection.AddBranches(TheChain)
         #this line handles all the cutting.
         TheChain = TheChain.CopyTree(TheConfig.CutConfig.CreateFinalCutString())
+        #if the configuration has an end action, perform it
+        if TheConfig.EndAction != None:
+            TheConfig.EndAction.PerformEndAction(TheConfig.EndAction,TheChain,TheConfig,OutputFile)
         #write it out
         TheChain.Write()
         print(Colors.GREEN+"[>>Complete<<]"+Colors.ENDC+" "+ConfigFile)

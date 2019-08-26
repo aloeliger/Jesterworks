@@ -4,6 +4,8 @@ import ROOT
 import glob
 import ConfigDefinitions.BranchAdditions.BranchDef as BranchDef
 import ConfigDefinitions.CuttingDefinitions.CutDef as CutDef
+import ConfigDefinitions.GlobalsDefinition.GlobalsDef as GlobalsDef
+import ConfigDefinitions.EndActionDefinitions.EndActionDef as EndActionDef
 
 class JesterworksConfiguration():
     def __init__(self):
@@ -14,8 +16,10 @@ class JesterworksConfiguration():
         self.OutputPath = ""
         self.OutputFile = ""
         self.OutputTreeName = ""
-        self.BranchCollection = BranchDef.UserBranchCollection()
+        self.BranchCollection = None#BranchDef.UserBranchCollection()
         self.CutConfig = CutDef.UserCutConfig()
+        self.Globals = None
+        self.EndAction = None
     def ReturnCompleteListOfFiles(self):
         return [self.Path+File for File in self.Files]
     def CreateListOfFilesForDirectory(self):
