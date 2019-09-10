@@ -5,20 +5,25 @@ import ConfigDefinitions.EndActionDefinitions.EndActionDef as EndActionDef
 
 def GrabHistograms(TheEndAction,TheChain,TheConfig,OutputFile):
     FirstHistogram = True
+    nevents = ROOT.TH1F()
+    pileup_mc = ROOT.TH1F()
     for File in TheConfig.ReturnCompleteListOfFiles():
+        #print(type(nevents))
         if FirstHistogram:
-            InputFile = ROOT.TFile(File)
-            nevents = InputFile.Get("nevents").Clone()
-            pileup_mc = InputFile.Get("pileup_mc").Clone()
+            FirstInputFile = ROOT.TFile(File)
+            nevents = FirstInputFile.Get("nevents").Clone()
+            pileup_mc = FirstInputFile.Get("pileup_mc").Clone()
             FirstHistogram = False
         else:
             InputFile = ROOT.TFile(File)
-            nevents.Add(InputFile.Get("nevents"))
+            nevents.Add(InputFile.Get("nevents"))       
             pileup_mc.Add(InputFile.Get("pileup_mc"))
             InputFile.Close()
+        #print(type(nevents))
     OutputFile.cd()
     nevents.Write()
     pileup_mc.Write()
+    FirstInputFile.Close()
 
 HistogramGrabber = EndActionDef.UserEndAction()
 HistogramGrabber.PerformEndAction = GrabHistograms
