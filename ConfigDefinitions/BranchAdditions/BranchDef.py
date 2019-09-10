@@ -22,7 +22,7 @@ class UserBranchCollection():
         for DefinedBranch in self.UserBranches:
             DefinedBranch.PrepareUserBranch(TheChain)
     def AddBranches(self,TheChain):
-        for i in tqdm(range(TheChain.GetEntries())):
+        for i in range(TheChain.GetEntries()):
             TheChain.GetEntry(i)
             for DefinedBranch in self.UserBranches:
                 DefinedBranch.CalculateValue(DefinedBranch,TheChain)
