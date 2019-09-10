@@ -4,6 +4,7 @@ import JesterworksUtils.RecursiveLoader
 import JesterworksUtils.Colors as Colors
 import argparse
 from ConfigDefinitions.JesterworksConfigurations import JesterworksConfiguration as JesterworksConfiguration
+import sys
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Jesterworks rnning script for skimming and selecting from root trees")
@@ -12,8 +13,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     TheLoader = JesterworksUtils.RecursiveLoader.RecursiveLoader()
-    for ConfigFile in args.ConfigFiles:
+    for ConfigFile in args.ConfigFiles:        
         TheConfigModule = TheLoader.LoadFromDirectoryPath(ConfigFile)
+        sys.stdout.write(Colors.BLUE+"[>>Processing<<]"+Colors.ENDC+" "+ConfigFile+"\r")
+        sys.stdout.flush()
         #scan the contents of the module looking for an
         #instance of a configuration        
         for item in dir(TheConfigModule):
@@ -38,4 +41,5 @@ if __name__ == "__main__":
             TheConfig.EndAction.PerformEndAction(TheConfig.EndAction,TheChain,TheConfig,OutputFile)
         #write it out
         TheChain.Write()
-        print(Colors.GREEN+"[>>Complete<<]"+Colors.ENDC+" "+ConfigFile)
+        sys.stdout.write(Colors.GREEN+"[>> Complete <<]"+Colors.ENDC+" "+ConfigFile+"\n")
+        sys.stdout.flush()
