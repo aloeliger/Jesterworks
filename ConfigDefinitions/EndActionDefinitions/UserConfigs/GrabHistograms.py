@@ -21,6 +21,7 @@ def GrabHistograms(TheEndAction,TheChain,TheConfig,OutputFile):
             InputFile.Close()
         #print(type(nevents))
     OutputFile.cd()
+    nevents.SetNameTitle("eventCount","eventCount")
     nevents.Write()
     pileup_mc.Write()
     FirstInputFile.Close()
