@@ -35,10 +35,16 @@ if __name__ == "__main__":
             TheConfig.BranchCollection.PrepCollection(TheChain)
             TheConfig.BranchCollection.AddBranches(TheChain)
         #this line handles all the cutting.
+        #print(TheChain.GetEntries())
         TheChain = TheChain.CopyTree(TheConfig.CutConfig.CreateFinalCutString())
+        #print(TheConfig.CutConfig.CutString)
+        #print(TheChain.GetEntries())
         #if the configuration has an end action, perform it
         if TheConfig.EndAction != None:
             TheConfig.EndAction.PerformEndAction(TheConfig.EndAction,TheChain,TheConfig,OutputFile)
+        #if the tree has a new output name, switch over to that
+        if TheConfig.OutputTreeName != '':
+            TheChain.SetNameTitle(TheConfig.OutputTreeName,TheConfig.OutputTreeName)
         #write it out
         TheChain.Write()
         sys.stdout.write(Colors.GREEN+"[>> Complete <<]"+Colors.ENDC+" "+ConfigFile+"\n")
