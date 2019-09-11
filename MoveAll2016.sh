@@ -26,3 +26,7 @@ mv SMHTT2016SelectionConfigs/ZH_0.root $1/ZH.root
 mv SMHTT2016SelectionConfigs/ZZ2L2Q_0.root $1/ZZ2L2Q.root
 mv SMHTT2016SelectionConfigs/ZZ4L_0.root $1/ZZ4L.root
 mv SMHTT2016SelectionConfigs/ggH_0.root $1/ggH.root
+
+mv SMHTT2016SelectionConfigs/WW_0.root $1/WW.root
+mv SMHTT2016SelectionConfigs/WZ_0.root $1/WZ.root
+mv SMHTT2016SelectionConfigs/ZZ_0.root $1/ZZ.root
