@@ -17,8 +17,8 @@ def CalculateTrigger1920(TheBranch,TheChain):
         TheBranch.BranchValue[0] = 0.0
 
 Trigger22 = Branch.UserBranch()
-Trigger22.Name = "Trigger24"
-Trigger24.CalculateValue = CalculateTrigger22
+Trigger22.Name = "Trigger22"
+Trigger22.CalculateValue = CalculateTrigger22
 
 Trigger1920 = Branch.UserBranch()
 Trigger1920.Name = "Trigger1920"
