@@ -12,7 +12,7 @@ class UserBranch():
         self.Branch = TheChain.Branch(self.Name,self.BranchValue,self.Name+"/F")        
     def FillUserBranch(self):
         self.Branch.Fill()
-    def DefaultBranchCalcFunction(self,TheChain):
+    def DefaultBranchCalcFunction(self,TheBranch,TheChain):
         raise RuntimeError("Branch: "+self.Name+" does not have a defined way to calculate it's value!")
 
 class UserBranchCollection():
