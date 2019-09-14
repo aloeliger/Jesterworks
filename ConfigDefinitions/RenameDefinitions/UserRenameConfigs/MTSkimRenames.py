@@ -1,0 +1,45 @@
+from ConfigDefinitions.RenameDefintions.RenameDef import RenameDictionary
+
+MTSkimRenaming =RenameDictionary()
+MTSkimRenaming.Renames = {
+    "GenWeight":"genweight",
+    "bweight_2016": "bweight",
+    "singleIsoMu22eta2p1Pass":"passMu22eta2p1",
+    "singleIsoTkMu22eta2p1Pass":"passTkMu22eta2p1",
+    "singleMu19eta2p1LooseTau20Pass":"passMu19Tau20",
+    "singleMu19eta2p1LooseTau20singleL1Pass":"passMu19Tau20SingleL1",
+    "mMatchesIsoMu22eta2p1Path":"matchMu22eta2p1_1",
+    "mMatchesIsoTkMu22eta2p1Path":"matchTkMu22eta2p1_1",
+    "mMatchesIsoMu19Tau20SingleL1Path":"matchMu19Tau20SingleL1_1",
+    "tMatchesIsoMu19Tau20SingleL1Path":"matchMu19Tau20SingleL1_2",
+    "mMatchesIsoMu22eta2p1Filter":"filterMu22eta2p1_1",
+    "mMatchesIsoTkMu22eta2p1Filter":"filterTkMu22eta2p1_1",
+    "mMatchesIsoMu19Tau20Filter":"filterMu19Tau20_1",
+    "tMatchesIsoMu19Tau20Filter":"filterMu19Tau20_2",
+    "mMatchesIsoMu19Tau20SingleL1Filter":"filterMu19Tau20SingleL1_1",
+    "tMatchesIsoMu19Tau20SingleL1Filter":"filterMu19Tau20SingleL1_2",
+    "tJetPt":"jetPt_2",
+    "genpT":"gen_Higgs_pt",
+    "genM":"gen_Higgs_mass",
+    "topQuarkPt1":"pt_top1",
+    "topQuarkPt2":"pt_top2",
+    "jetVeto30":"njets"
+    "bjetDeepCSVVeto20Medium_2016_DR0p5":"nbtag",
+    "bjetDeepCSVVeto20Loose_2016_DR0p5":"nbtagL",
+    "jetVeto30_JetRelativeSampleUp":"njets_JetRelativeSampleUp",
+    "jetVeto30_JetRelativeSampleDown":"njets_JetRelativeSampleDown",
+    "jetVeto30_JetEta3to5Up":"njets_JetEta3to5Up",
+    "jetVeto30_JetEta3to5Down":"njets_JetEta3to5Down",
+    "jetVeto30_JetEta0to5Up":"njets_JetEta0to5Up",
+    "jetVeto30_JetEta0to5Down":"njets_JetEta0to5Down",
+    "jetVeto30_JetEta0to3Up":"njets_JetEta0to3Up",
+    "jetVeto30_JetEta0to3Down":"njets_JetEta0to3Down",
+    "jetVeto30_JetRelativeBalUp":"njets_JetRelativeBalUp",
+    "jetVeto30_JetRelativeBalDown":"njets_JetRelativeBalDown",
+    "jetVeto30_JetEC2Up":"njets_JetEC2Up",
+    "jetVeto30_JetEC2Down":"njets_JetEC2Down",
+
+    "mZTTGenMatching":"gen_match_1",
+    "tZTTGenMatching":"gen_match_2",
+
+}
