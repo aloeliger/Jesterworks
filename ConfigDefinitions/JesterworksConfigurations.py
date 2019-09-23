@@ -6,6 +6,7 @@ import ConfigDefinitions.BranchAdditions.BranchDef as BranchDef
 import ConfigDefinitions.CuttingDefinitions.CutDef as CutDef
 import ConfigDefinitions.GlobalsDefinition.GlobalsDef as GlobalsDef
 import ConfigDefinitions.EndActionDefinitions.EndActionDef as EndActionDef
+import ConfigDefinitions.RenameDefinitions.RenameDef as RenameDef
 
 class JesterworksConfiguration():
     def __init__(self):
@@ -20,6 +21,7 @@ class JesterworksConfiguration():
         self.CutConfig = CutDef.UserCutConfig()
         self.Globals = None
         self.EndAction = None
+        self.RenameScheme = None
     def ReturnCompleteListOfFiles(self):
         return [self.Path+File for File in self.Files]
     def CreateListOfFilesForDirectory(self):

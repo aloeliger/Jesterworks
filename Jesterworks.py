@@ -6,6 +6,7 @@ import argparse
 from ConfigDefinitions.JesterworksConfigurations import JesterworksConfiguration as JesterworksConfiguration
 import sys
 import os
+import traceback
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Jesterworks rnning script for skimming and selecting from root trees")
@@ -52,11 +53,14 @@ if __name__ == "__main__":
             if TheConfig.OutputTreeName != '':
                 TheChain.SetNameTitle(TheConfig.OutputTreeName,TheConfig.OutputTreeName)
                 #write it out
+            #Perform any renaming.
+            if TheConfig.RenameScheme != None:
+                TheConfig.RenameSceme.PerformTheRenaming(TheChain)
             TheChain.Write()
         except Exception as error:
             sys.stdout.write(Colors.RED+"[>>  Error!  <<]"+Colors.ENDC+" "+ConfigFile+"\n")
-            sys.stdout.flush()
-            print(error)
+            sys.stdout.flush()            
+            traceback.print_exc()
 
         else:
             sys.stdout.write(Colors.GREEN+"[>> Complete <<]"+Colors.ENDC+" "+ConfigFile+"\n")
