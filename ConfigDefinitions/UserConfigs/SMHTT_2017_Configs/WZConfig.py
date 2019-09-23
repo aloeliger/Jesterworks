@@ -6,11 +6,11 @@ from ConfigDefinitions.EndActionDefinitions.UserConfigs.GrabHistograms import Hi
 
 DataConfig = Config()
 DataConfig.Path = "/data/ccaillol/smhmt2017_svfitted_13jun/"
-DataConfig.Files = ["ZH125.root"]
+DataConfig.Files = ["WZ.root"]
 DataConfig.InputTreeName = "mutau_tree"
-DataConfig.SampleName = "ZH"
-DataConfig.OutputPath = "/data/aloeliger/SMHTT_Selected_Experimental/"
-DataConfig.OutputFile = "ZH.root"
+DataConfig.SampleName = "WZ"
+DataConfig.OutputPath = "/data/aloeliger/SMHTT_Selected_2017/"
+DataConfig.OutputFile = "WZ.root"
 DataConfig.OutputTreeName = 'mt_Selected'
 DataConfig.BranchCollection = BranchCollection
 DataConfig.CutConfig = CutConfig
