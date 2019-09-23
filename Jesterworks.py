@@ -55,7 +55,7 @@ if __name__ == "__main__":
                 #write it out
             #Perform any renaming.
             if TheConfig.RenameScheme != None:
-                TheConfig.RenameSceme.PerformTheRenaming(TheChain)
+                TheConfig.RenameScheme.PerformTheRenaming(TheChain)
             TheChain.Write()
         except Exception as error:
             sys.stdout.write(Colors.RED+"[>>  Error!  <<]"+Colors.ENDC+" "+ConfigFile+"\n")
