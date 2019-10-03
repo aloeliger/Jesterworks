@@ -15,6 +15,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     TheLoader = JesterworksUtils.RecursiveLoader.RecursiveLoader()
+    NumErrors = 0
     for ConfigFile in args.ConfigFiles: 
         try:
             TheConfigModule = TheLoader.LoadFromDirectoryPath(ConfigFile)
@@ -41,11 +42,11 @@ if __name__ == "__main__":
             if TheConfig.BranchCollection != None:
                 TheConfig.BranchCollection.PrepCollection(TheChain)
                 TheConfig.BranchCollection.AddBranches(TheChain)
-            #this line handles all the cutting.
-            #print(TheChain.GetEntries())
+            # if we have any branch corrections to do, do them
+            if TheConfig.BranchCorrections != None:
+                TheChain = TheConfig.BranchCorrections.GetCorrectedTree(TheChain)
+            #this line handles all the cutting.            
             TheChain = TheChain.CopyTree(TheConfig.CutConfig.CreateFinalCutString())
-            #print(TheConfig.CutConfig.CutString)
-            #print(TheChain.GetEntries())
             #if the configuration has an end action, perform it
             if TheConfig.EndAction != None:
                 TheConfig.EndAction.PerformEndAction(TheConfig.EndAction,TheChain,TheConfig,OutputFile)
@@ -61,7 +62,13 @@ if __name__ == "__main__":
             sys.stdout.write(Colors.RED+"[>>  Error!  <<]"+Colors.ENDC+" "+ConfigFile+"\n")
             sys.stdout.flush()            
             traceback.print_exc()
+            NumErrors+=1
 
         else:
             sys.stdout.write(Colors.GREEN+"[>> Complete <<]"+Colors.ENDC+" "+ConfigFile+"\n")
             sys.stdout.flush()
+    if(NumErrors > 0):
+        print("There were "+str(NumErrors)+" error(s).")
+        print("Please check them and resubmit.")
+    else:
+        print("Completed with no errors!")
