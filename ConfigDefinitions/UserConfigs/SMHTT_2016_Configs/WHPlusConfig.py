@@ -5,7 +5,7 @@ from ConfigDefinitions.CuttingDefinitions.UserCutConfigs.SMHTT2016Cuts import SM
 from ConfigDefinitions.EndActionDefinitions.UserConfigs.GrabHistograms import HistogramGrabber as HistogramGrabber
 
 DataConfig = Config()
-DataConfig.Path = "/data/ccaillol/smhmt2016_svfitted_16aug/"
+DataConfig.Path = "/data/ccaillol/smhmt2016_svfitted_12oct/"
 DataConfig.Files = ["WplusH125.root"]
 DataConfig.InputTreeName = "mutau_tree"
 DataConfig.SampleName = "WHPlus"

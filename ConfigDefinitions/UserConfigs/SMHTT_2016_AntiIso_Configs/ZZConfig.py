@@ -5,7 +5,7 @@ from ConfigDefinitions.CuttingDefinitions.UserCutConfigs.SMHTT2016Cuts_AntiIso i
 from ConfigDefinitions.EndActionDefinitions.UserConfigs.GrabHistograms import HistogramGrabber as HistogramGrabber
 
 DataConfig = Config()
-DataConfig.Path = "/data/aloeliger/SMHTT/smhmt2016_svfitted_25aug/"
+DataConfig.Path = "/data/ccaillol/smhmt2016_svfitted_12oct/"
 DataConfig.Files = ["ZZ.root"]
 DataConfig.InputTreeName = "mutau_tree"
 DataConfig.SampleName = "ZZ"
