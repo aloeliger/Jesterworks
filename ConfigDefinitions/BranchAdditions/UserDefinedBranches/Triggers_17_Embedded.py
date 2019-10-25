@@ -19,7 +19,8 @@ def CalculateTrigger27(TheBranch,TheChain):
         TheBranch.BranchValue[0] = 0.0
 
 def CalculateTrigger2027(TheBranch,TheChain):
-    if(TheChain.pt_1 > 21 and TheChain.pt_2 > 31 
+    if(TheChain.pt_1 > 21 
+       and TheChain.pt_2 > 32
        and TheChain.pt_1 < 25
        and abs(TheChain.eta_1) < 2.1
        and abs(TheChain.eta_2) < 2.1

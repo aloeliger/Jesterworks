@@ -1,25 +1,30 @@
 import ConfigDefinitions.BranchAdditions.BranchDef as Branch
 
 def CalculateTrigger24(TheBranch,TheChain):
-    if (TheChain.passMu24 and TheChain.matchMu24_1
-        and TheChain.filterMu24_1 and TheChain.pt_1 > 25.0):
+    if (TheChain.passMu24 
+        and TheChain.matchMu24_1
+        and TheChain.filterMu24_1 
+        and TheChain.pt_1 > 25.0):
         TheBranch.BranchValue[0] = 1.0
     else:
         TheBranch.BranchValue[0] = 0.0
 
 def CalculateTrigger27(TheBranch,TheChain):
-    if(TheChain.passMu27 and TheChain.matchMu27_1 
-       and TheChain.filterMu27_1 and TheChain.pt_1 > 25.0):
+    if(TheChain.passMu27 
+       and TheChain.matchMu27_1 
+       and TheChain.filterMu27_1 
+       and TheChain.pt_1 > 25.0):
         TheBranch.BranchValue[0] = 1.0
     else:
         TheBranch.BranchValue[0] = 0.0
 
 def CalculateTrigger2027(TheBranch,TheChain):
-    if(TheChain.passMu20Tau27 and TheChain.matchMu20Tau27_1 
+    if(TheChain.passMu20Tau27 
+       and TheChain.matchMu20Tau27_1 
        and TheChain.matchMu20Tau27_2
        and TheChain.filterMu20Tau27_1                    
        and TheChain.filterMu20Tau27_2
-       and TheChain.pt_1 > 21 and TheChain.pt_2 > 31 
+       and TheChain.pt_1 > 21 and TheChain.pt_2 > 32 
        and TheChain.pt_1 < 25
        and abs(TheChain.eta_1) < 2.1
        and abs(TheChain.eta_2) < 2.1):
