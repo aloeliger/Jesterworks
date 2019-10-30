@@ -23,9 +23,8 @@ def CalculateTrigger2027(TheBranch,TheChain):
         and TheChain.pt_2 > 32
         and abs(TheChain.eta_1) < 2.1
         and abs(TheChain.eta_2) < 2.1
-        and TheChain.matchEmbFilter_Mu20Tau27_1
-        and ((TheChain.run < 317509 and TheChain.matchEmbFilter_Mu20Tau27_2)
-             or (TheChain.run >= 317509 and TheChain.matchEmbFilter_Mu20HPSTau27_2))
+        #and TheChain.matchEmbFilter_Mu20Tau27_1        
+        #and TheChain.matchEmbFilter_Mu20HPSTau27_2
     ):        
         TheBranch.BranchValue[0] = 1.0
     else:

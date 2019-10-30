@@ -9,6 +9,7 @@ SMHTT2016Cuts.Cuts.append("!(Flag_goodVertices || Flag_globalSuperTightHalo2016F
 SMHTT2016Cuts.Cuts.append("Trigger22 || Trigger1920")
 SMHTT2016Cuts.Cuts.append("gen_match_2 != 6")#avoid overlap with FF's
 SMHTT2016Cuts.Cuts.append("byVVVLooseDeepVSe_2 && byTightDeepVSmu_2")
+SMHTT2016Cuts.Cuts.append("DeltaR > 0.5")
 SMHTT2016Cuts.Cuts.append("nbtag <= 0 && nbtagL <= 1")
 SMHTT2016Cuts.Cuts.append("q_1 * q_2 < 0")
 SMHTT2016Cuts.Cuts.append("byMediumDeepVSjet_2 && iso_1 < 0.15")

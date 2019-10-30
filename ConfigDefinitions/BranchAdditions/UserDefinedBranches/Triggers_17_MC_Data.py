@@ -24,7 +24,8 @@ def CalculateTrigger2027(TheBranch,TheChain):
        and TheChain.matchMu20Tau27_2
        and TheChain.filterMu20Tau27_1                    
        and TheChain.filterMu20Tau27_2
-       and TheChain.pt_1 > 21 and TheChain.pt_2 > 32 
+       and TheChain.pt_1 > 21 
+       and TheChain.pt_2 > 32 
        and TheChain.pt_1 < 25
        and abs(TheChain.eta_1) < 2.1
        and abs(TheChain.eta_2) < 2.1):

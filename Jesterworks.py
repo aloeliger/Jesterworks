@@ -2,6 +2,7 @@
 import ROOT
 import JesterworksUtils.RecursiveLoader
 import JesterworksUtils.Colors as Colors
+from JesterworksUtils.CutFlowCreator import CutFlowCreator
 import argparse
 from ConfigDefinitions.JesterworksConfigurations import JesterworksConfiguration as JesterworksConfiguration
 import sys
@@ -11,6 +12,7 @@ import traceback
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Jesterworks rnning script for skimming and selecting from root trees")
     parser.add_argument("--ConfigFiles",nargs="+",help="Python based configurations files used to specify output",required=True)
+    parser.add_argument("--CreateCutFlow",help="Create a cutflow histogram for the file and store it",action="store_true")
 
     args = parser.parse_args()
 
@@ -45,6 +47,10 @@ if __name__ == "__main__":
             # if we have any branch corrections to do, do them
             if TheConfig.BranchCorrections != None:
                 TheChain = TheConfig.BranchCorrections.GetCorrectedTree(TheChain)
+            #before we do the final cutting, let's create the cutflow histogram
+            if args.CreateCutFlow:
+                cutFlowHandler = CutFlowCreator()
+                cutFlowHandler.CreateCutFlow(TheConfig,TheChain)
             #this line handles all the cutting.            
             TheChain = TheChain.CopyTree(TheConfig.CutConfig.CreateFinalCutString())
             #if the configuration has an end action, perform it
@@ -58,6 +64,9 @@ if __name__ == "__main__":
             if TheConfig.RenameScheme != None:
                 TheConfig.RenameScheme.PerformTheRenaming(TheChain)
             TheChain.Write()
+            #if we made a cutflow, write that as well
+            if args.CreateCutFlow:
+                cutFlowHandler.cutFlowHistogram.Write()
         except Exception as error:
             sys.stdout.write(Colors.RED+"[>>  Error!  <<]"+Colors.ENDC+" "+ConfigFile+"\n")
             sys.stdout.flush()            
