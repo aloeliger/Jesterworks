@@ -5,7 +5,7 @@ import ConfigDefinitions.BranchAdditions.UserDefinedBranches.VisibleMass as Visi
 import ConfigDefinitions.BranchAdditions.UserDefinedBranches.DR as DeltaR
 import ConfigDefinitions.BranchAdditions.UserDefinedBranches.TES as TES
 import ConfigDefinitions.BranchAdditions.UserDefinedBranches.MES as MES
-import ConfigDefintiions.BranchAdditions.UserDefinedBranches.LLFakeES as LLFakeES
+import ConfigDefinitions.BranchAdditions.UserDefinedBranches.LLFakeES as LLFakeES
 
 SMHTT_2016_Collection = BranchDef.UserBranchCollection()
 SMHTT_2016_Collection.UserBranches =  [Triggers.Trigger22,
@@ -21,14 +21,14 @@ SMHTT_2016_Collection.UserBranches =  [Triggers.Trigger22,
                                        TES.TES_MET_DOWN_2016Branch,
                                        TES.TES_METPhi_UP_2016Branch,
                                        TES.TES_METPhi_DOWN_2016Branch,
-                                       MES.MES_E_UP_Branch,
-                                       MES.MES_E_DOWN_Branch,
-                                       MES.MES_Pt_UP_Branch,
-                                       MES.MES_Pt_DOWN_Branch,
-                                       MES.MES_MET_UP_Branch,
-                                       MES.MES_MET_DOWN_Branch,
-                                       MES.MES_METPhi_UP_Branch,
-                                       MES.MES_METPhi_DOWN_Branch,
+                                       MES.muonES_E_UP_Branch,
+                                       MES.muonES_E_DOWN_Branch,
+                                       MES.muonES_Pt_UP_Branch,
+                                       MES.muonES_Pt_DOWN_Branch,
+                                       MES.muonES_MET_UP_Branch,
+                                       MES.muonES_MET_DOWN_Branch,
+                                       MES.muonES_METPhi_UP_Branch,
+                                       MES.muonES_METPhi_DOWN_Branch,
                                        LLFakeES.EES_E_UP_Branch,
                                        LLFakeES.EES_E_DOWN_Branch,
                                        LLFakeES.EES_Pt_UP_Branch,

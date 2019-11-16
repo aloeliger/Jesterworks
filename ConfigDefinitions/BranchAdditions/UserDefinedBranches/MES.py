@@ -14,7 +14,7 @@ def CreateMuonES_E_UP(theBranch,theChain):
         correctedMuVector = muVector * (1.0 + 0.004)
     elif(muVector.Eta() >= 1.2 and muVector.Eta() < 2.1):
         correctedMuVector = muVector * (1.0 + 0.009)
-    elif(muVector.eta() >= 2.1 and muVector.Eta() < 2.4):
+    elif(muVector.Eta() >= 2.1 and muVector.Eta() < 2.4):
         correctedMuVector = muVector * (1.0 + 0.017)
     
     theBranch.BranchValue[0] = correctedMuVector.E()
@@ -31,7 +31,7 @@ def CreateMuonES_E_DOWN(theBranch,theChain):
         correctedMuVector = muVector * (1.0 - 0.004)
     elif(muVector.Eta() >= 1.2 and muVector.Eta() < 2.1):
         correctedMuVector = muVector * (1.0 - 0.009)
-    elif(muVector.eta() >= 2.1 and muVector.Eta() < 2.4):
+    elif(muVector.Eta() >= 2.1 and muVector.Eta() < 2.4):
         correctedMuVector = muVector * (1.0 - 0.017)
     
     theBranch.BranchValue[0] = correctedMuVector.E()
@@ -48,7 +48,7 @@ def CreateMuonES_Pt_UP(theBranch,theChain):
         correctedMuVector = muVector * (1.0 + 0.004)
     elif(muVector.Eta() >= 1.2 and muVector.Eta() < 2.1):
         correctedMuVector = muVector * (1.0 + 0.009)
-    elif(muVector.eta() >= 2.1 and muVector.Eta() < 2.4):
+    elif(muVector.Eta() >= 2.1 and muVector.Eta() < 2.4):
         correctedMuVector = muVector * (1.0 + 0.017)
     
     theBranch.BranchValue[0] = correctedMuVector.Pt()
@@ -65,7 +65,7 @@ def CreateMuonES_Pt_DOWN(theBranch,theChain):
         correctedMuVector = muVector * (1.0 - 0.004)
     elif(muVector.Eta() >= 1.2 and muVector.Eta() < 2.1):
         correctedMuVector = muVector * (1.0 - 0.009)
-    elif(muVector.eta() >= 2.1 and muVector.Eta() < 2.4):
+    elif(muVector.Eta() >= 2.1 and muVector.Eta() < 2.4):
         correctedMuVector = muVector * (1.0 - 0.017)
     
     theBranch.BranchValue[0] = correctedMuVector.Pt()
@@ -83,7 +83,7 @@ def CreateMuonES_MET_UP(theBranch,theChain):
         correctedMuVector = muVector * (1.0 + 0.004)
     elif(muVector.Eta() >= 1.2 and muVector.Eta() < 2.1):
         correctedMuVector = muVector * (1.0 + 0.009)
-    elif(muVector.eta() >= 2.1 and muVector.Eta() < 2.4):
+    elif(muVector.Eta() >= 2.1 and muVector.Eta() < 2.4):
         correctedMuVector = muVector * (1.0 + 0.017)
     correctedMETVector = GetCorrectedMetVector(muVector,correctedMuVector,metVector)
     
@@ -102,7 +102,7 @@ def CreateMuonES_MET_DOWN(theBranch,theChain):
         correctedMuVector = muVector * (1.0 - 0.004)
     elif(muVector.Eta() >= 1.2 and muVector.Eta() < 2.1):
         correctedMuVector = muVector * (1.0 - 0.009)
-    elif(muVector.eta() >= 2.1 and muVector.Eta() < 2.4):
+    elif(muVector.Eta() >= 2.1 and muVector.Eta() < 2.4):
         correctedMuVector = muVector * (1.0 - 0.017)
     correctedMETVector = GetCorrectedMetVector(muVector,correctedMuVector,metVector)
     
@@ -121,7 +121,7 @@ def CreateMuonES_METPhi_UP(theBranch,theChain):
         correctedMuVector = muVector * (1.0 + 0.004)
     elif(muVector.Eta() >= 1.2 and muVector.Eta() < 2.1):
         correctedMuVector = muVector * (1.0 + 0.009)
-    elif(muVector.eta() >= 2.1 and muVector.Eta() < 2.4):
+    elif(muVector.Eta() >= 2.1 and muVector.Eta() < 2.4):
         correctedMuVector = muVector * (1.0 + 0.017)
     correctedMETVector = GetCorrectedMetVector(muVector,correctedMuVector,metVector)
     
@@ -140,7 +140,7 @@ def CreateMuonES_METPhi_DOWN(theBranch,theChain):
         correctedMuVector = muVector * (1.0 - 0.004)
     elif(muVector.Eta() >= 1.2 and muVector.Eta() < 2.1):
         correctedMuVector = muVector * (1.0 - 0.009)
-    elif(muVector.eta() >= 2.1 and muVector.Eta() < 2.4):
+    elif(muVector.Eta() >= 2.1 and muVector.Eta() < 2.4):
         correctedMuVector = muVector * (1.0 - 0.017)
     correctedMETVector = GetCorrectedMetVector(muVector,correctedMuVector,metVector)
     

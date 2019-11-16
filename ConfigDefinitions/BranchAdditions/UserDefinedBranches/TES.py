@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import ConfigDefinitinos.BranchAdditions.BranchDef as Branch
+import ConfigDefinitions.BranchAdditions.BranchDef as Branch
 import ROOT
 
 def GetCorrectedMetVector(tauVector, correctedTauVector, metVector):
@@ -45,7 +45,7 @@ def CalculateTES_PT_UP_2016(theBranch,theChain):
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
-    elif theChain.l2_decaymode == 5:
+    elif theChain.gen_match_2 == 5:
         if theChain.l2_decayMode == 0:
             correctedTauVector = tauVector * (1.0 + 0.010)
         elif theChain.l2_decayMode == 1:
@@ -72,7 +72,7 @@ def CalculateTES_MET_UP_2016(theBranch,theChain):
     tauVector = ROOT.TLorentzVector()
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
     metVector = ROOT.TLorentzVector()
-    metVector.SetPtEtaPhiM(theChain.theChain.met,0.0,theChain.metphi,0.0)
+    metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
     elif theChain.gen_match_2 == 5:
@@ -89,7 +89,7 @@ def CalculateTES_MET_DOWN_2016(theBranch,theChain):
     tauVector = ROOT.TLorentzVector()
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
     metVector = ROOT.TLorentzVector()
-    metVector.SetPtEtaPhiM(theChain.theChain.met,0.0,theChain.metphi,0.0)
+    metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
     elif theChain.gen_match_2 == 5:
@@ -106,7 +106,7 @@ def CalculateTES_METPhi_UP_2016(theBranch,theChain):
     tauVector = ROOT.TLorentzVector()
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
     metVector = ROOT.TLorentzVector()
-    metVector.SetPtEtaPhiM(theChain.theChain.met,0.0,theChain.metphi,0.0)
+    metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
     elif theChain.gen_match_2 == 5:
@@ -116,14 +116,14 @@ def CalculateTES_METPhi_UP_2016(theBranch,theChain):
             correctedTauVector = tauVector * (1.0 + 0.009)
         elif theChain.l2_decayMode == 10 or theChain.l2_decayMode == 11:
             correctedTauVector = tauVector * (1.0 + 0.011)
-    correctedMETVector = GetCorrectedMetVector(tauVector,correctedTauVector,)
+    correctedMETVector = GetCorrectedMetVector(tauVector,correctedTauVector,metVector)
     theBranch.BranchValue[0] = correctedMETVector.Phi()
 
 def CalculateTES_METPhi_DOWN_2016(theBranch,theChain):
     tauVector = ROOT.TLorentzVector()
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
     metVector = ROOT.TLorentzVector()
-    metVector.SetPtEtaPhiM(theChain.theChain.met,0.0,theChain.metphi,0.0)
+    metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
     elif theChain.gen_match_2 == 5:
@@ -133,7 +133,7 @@ def CalculateTES_METPhi_DOWN_2016(theBranch,theChain):
             correctedTauVector = tauVector * (1.0 - 0.009)
         elif theChain.l2_decayMode == 10 or theChain.l2_decayMode == 11:
             correctedTauVector = tauVector * (1.0 - 0.011)
-    correctedMETVector = GetCorrectedMetVector(tauVector,correctedTauVector,)
+    correctedMETVector = GetCorrectedMetVector(tauVector,correctedTauVector,metVector)
     theBranch.BranchValue[0] = correctedMETVector.Phi()
 
 #2017 calculations
@@ -149,7 +149,7 @@ def CalculateTES_E_UP_2017(theBranch,theChain):
             correctedTauVector = tauVector * (1.0 + 0.008)
         elif theChain.l2_decayMode == 10:
             correctedTauVector = tauVector * (1.0 + 0.009)
-        elif the Chain.l2_decayMode == 11:
+        elif theChain.l2_decayMode == 11:
             correctedTauVector = tauVector * (1.0 + 0.010)
     theBranch.BranchValue[0] = correctedTauVector.E()
 
@@ -165,7 +165,7 @@ def CalculateTES_E_DOWN_2017(theBranch,theChain):
             correctedTauVector = tauVector * (1.0 - 0.008)
         elif theChain.l2_decayMode == 10:
             correctedTauVector = tauVector * (1.0 - 0.009)
-        elif the Chain.l2_decayMode == 11:
+        elif theChain.l2_decayMode == 11:
             correctedTauVector = tauVector * (1.0 - 0.010)
     theBranch.BranchValue[0] = correctedTauVector.E()
 
@@ -174,14 +174,14 @@ def CalculateTES_PT_UP_2017(theBranch,theChain):
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
-    elif theChain.l2_decaymode == 5:
+    elif theChain.gen_match_2 == 5:
         if theChain.l2_decayMode == 0:
             correctedTauVector = tauVector * (1.0 + 0.008)
         elif theChain.l2_decayMode == 1:
             correctedTauVector = tauVector * (1.0 + 0.008)
         elif theChain.l2_decayMode == 10:
             correctedTauVector = tauVector * (1.0 + 0.009)
-        elif the Chain.l2_decayMode == 11:
+        elif theChain.l2_decayMode == 11:
             correctedTauVector = tauVector * (1.0 + 0.010)
     theBranch.BranchValue[0] = correctedTauVector.Pt()
 
@@ -197,7 +197,7 @@ def CalculateTES_PT_DOWN_2017(theBranch,theChain):
             correctedTauVector = tauVector * (1.0 - 0.008)
         elif theChain.l2_decayMode == 10:
             correctedTauVector = tauVector * (1.0 - 0.009)
-        elif the Chain.l2_decayMode == 11:
+        elif theChain.l2_decayMode == 11:
             correctedTauVector = tauVector * (1.0 - 0.010)
     theBranch.BranchValue[0] = correctedTauVector.Pt()
 
@@ -205,17 +205,17 @@ def CalculateTES_MET_UP_2017(theBranch,theChain):
     tauVector = ROOT.TLorentzVector()
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
     metVector = ROOT.TLorentzVector()
-    metVector.SetPtEtaPhiM(theChain.theChain.met,0.0,theChain.metphi,0.0)
+    metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
-    elif theChain.l2_decaymode == 5:
+    elif theChain.gen_match_2 == 5:
         if theChain.l2_decayMode == 0:
             correctedTauVector = tauVector * (1.0 + 0.008)
         elif theChain.l2_decayMode == 1:
             correctedTauVector = tauVector * (1.0 + 0.008)
         elif theChain.l2_decayMode == 10:
             correctedTauVector = tauVector * (1.0 + 0.009)
-        elif the Chain.l2_decayMode == 11:
+        elif theChain.l2_decayMode == 11:
             correctedTauVector = tauVector * (1.0 + 0.010)
     correctedMETVector = GetCorrectedMetVector(tauVector,correctedTauVector,metVector)
     theBranch.BranchValue[0] = correctedMETVector.Pt()
@@ -224,17 +224,17 @@ def CalculateTES_MET_DOWN_2017(theBranch,theChain):
     tauVector = ROOT.TLorentzVector()
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
     metVector = ROOT.TLorentzVector()
-    metVector.SetPtEtaPhiM(theChain.theChain.met,0.0,theChain.metphi,0.0)
+    metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
-    elif theChain.l2_decaymode == 5:
+    elif theChain.gen_match_2 == 5:
         if theChain.l2_decayMode == 0:
             correctedTauVector = tauVector * (1.0 - 0.008)
         elif theChain.l2_decayMode == 1:
             correctedTauVector = tauVector * (1.0 - 0.008)
         elif theChain.l2_decayMode == 10:
             correctedTauVector = tauVector * (1.0 - 0.009)
-        elif the Chain.l2_decayMode == 11:
+        elif theChain.l2_decayMode == 11:
             correctedTauVector = tauVector * (1.0 - 0.010)
     correctedMETVector = GetCorrectedMetVector(tauVector,correctedTauVector,metVector)
     theBranch.BranchValue[0] = correctedMETVector.Pt()
@@ -243,17 +243,17 @@ def CalculateTES_METPhi_UP_2017(theBranch,theChain):
     tauVector = ROOT.TLorentzVector()
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
     metVector = ROOT.TLorentzVector()
-    metVector.SetPtEtaPhiM(theChain.theChain.met,0.0,theChain.metphi,0.0)
+    metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
-    elif theChain.l2_decaymode == 5:
+    elif theChain.gen_match_2 == 5:
         if theChain.l2_decayMode == 0:
             correctedTauVector = tauVector * (1.0 + 0.008)
         elif theChain.l2_decayMode == 1:
             correctedTauVector = tauVector * (1.0 + 0.008)
         elif theChain.l2_decayMode == 10:
             correctedTauVector = tauVector * (1.0 + 0.009)
-        elif the Chain.l2_decayMode == 11:
+        elif theChain.l2_decayMode == 11:
             correctedTauVector = tauVector * (1.0 + 0.010)
     correctedMETVector = GetCorrectedMetVector(tauVector,correctedTauVector,metVector)
     theBranch.BranchValue[0] = correctedMETVector.Phi()
@@ -262,17 +262,17 @@ def CalculateTES_METPhi_DOWN_2017(theBranch,theChain):
     tauVector = ROOT.TLorentzVector()
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
     metVector = ROOT.TLorentzVector()
-    metVector.SetPtEtaPhiM(theChain.theChain.met,0.0,theChain.metphi,0.0)
+    metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
-    elif theChain.l2_decaymode == 5:
+    elif theChain.gen_match_2 == 5:
         if theChain.l2_decayMode == 0:
             correctedTauVector = tauVector * (1.0 - 0.008)
         elif theChain.l2_decayMode == 1:
             correctedTauVector = tauVector * (1.0 - 0.008)
         elif theChain.l2_decayMode == 10:
             correctedTauVector = tauVector * (1.0 - 0.009)
-        elif the Chain.l2_decayMode == 11:
+        elif theChain.l2_decayMode == 11:
             correctedTauVector = tauVector * (1.0 - 0.010)
     correctedMETVector = GetCorrectedMetVector(tauVector,correctedTauVector,metVector)
     theBranch.BranchValue[0] = correctedMETVector.Phi()
@@ -311,7 +311,7 @@ def CalculateTES_PT_UP_2018(theBranch,theChain):
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
-    elif theChain.l2_decaymode == 5:
+    elif theChain.gen_match_2 == 5:
         if theChain.l2_decayMode == 0:
             correctedTauVector = tauVector * (1.0 + 0.011)
         elif theChain.l2_decayMode == 1:
@@ -337,11 +337,11 @@ def CalculateTES_PT_DOWN_2018(theBranch,theChain):
 def CalculateTES_MET_UP_2018(theBranch,theChain):
     tauVector = ROOT.TLorentzVector()
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
-    metVector = ROOt.TLorentzVector()
+    metVector = ROOT.TLorentzVector()
     metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
-    elif theChain.l2_decaymode == 5:
+    elif theChain.gen_match_2 == 5:
         if theChain.l2_decayMode == 0:
             correctedTauVector = tauVector * (1.0 + 0.011)
         elif theChain.l2_decayMode == 1:
@@ -354,11 +354,11 @@ def CalculateTES_MET_UP_2018(theBranch,theChain):
 def CalculateTES_MET_DOWN_2018(theBranch,theChain):
     tauVector = ROOT.TLorentzVector()
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
-    metVector = ROOt.TLorentzVector()
+    metVector = ROOT.TLorentzVector()
     metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
-    elif theChain.l2_decaymode == 5:
+    elif theChain.gen_match_2 == 5:
         if theChain.l2_decayMode == 0:
             correctedTauVector = tauVector * (1.0 - 0.011)
         elif theChain.l2_decayMode == 1:
@@ -371,11 +371,11 @@ def CalculateTES_MET_DOWN_2018(theBranch,theChain):
 def CalculateTES_METPhi_UP_2018(theBranch,theChain):
     tauVector = ROOT.TLorentzVector()
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
-    metVector = ROOt.TLorentzVector()
+    metVector = ROOT.TLorentzVector()
     metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
-    elif theChain.l2_decaymode == 5:
+    elif theChain.gen_match_2 == 5:
         if theChain.l2_decayMode == 0:
             correctedTauVector = tauVector * (1.0 + 0.011)
         elif theChain.l2_decayMode == 1:
@@ -388,11 +388,11 @@ def CalculateTES_METPhi_UP_2018(theBranch,theChain):
 def CalculateTES_METPhi_DOWN_2018(theBranch,theChain):
     tauVector = ROOT.TLorentzVector()
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
-    metVector = ROOt.TLorentzVector()
+    metVector = ROOT.TLorentzVector()
     metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
     if theChain.gen_match_2 != 5:
         correctedTauVector = tauVector
-    elif theChain.l2_decaymode == 5:
+    elif theChain.gen_match_2 == 5:
         if theChain.l2_decayMode == 0:
             correctedTauVector = tauVector * (1.0 - 0.011)
         elif theChain.l2_decayMode == 1:
