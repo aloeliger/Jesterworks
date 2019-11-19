@@ -432,7 +432,7 @@ TES_METPhi_UP_2016Branch.Name = "TES_METPhi_UP"
 TES_METPhi_UP_2016Branch.CalculateValue = CalculateTES_METPhi_UP_2016
 
 TES_METPhi_DOWN_2016Branch = Branch.UserBranch()
-TES_METPhi_DOWN_2016Branch.Name = "TES_MET_DOWN"
+TES_METPhi_DOWN_2016Branch.Name = "TES_METPhi_DOWN"
 TES_METPhi_DOWN_2016Branch.CalculateValue = CalculateTES_METPhi_DOWN_2016
 
 #2017 branches
@@ -465,7 +465,7 @@ TES_METPhi_UP_2017Branch.Name = "TES_METPhi_UP"
 TES_METPhi_UP_2017Branch.CalculateValue = CalculateTES_METPhi_UP_2017
 
 TES_METPhi_DOWN_2017Branch = Branch.UserBranch()
-TES_METPhi_DOWN_2017Branch.Name = "TES_MET_DOWN"
+TES_METPhi_DOWN_2017Branch.Name = "TES_METPhi_DOWN"
 TES_METPhi_DOWN_2017Branch.CalculateValue = CalculateTES_METPhi_DOWN_2017
 
 #2018 branches

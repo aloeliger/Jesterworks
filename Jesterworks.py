@@ -53,6 +53,10 @@ if __name__ == "__main__":
                 cutFlowHandler.CreateCutFlow(TheConfig,TheChain)
             #this line handles all the cutting.            
             TheChain = TheChain.CopyTree(TheConfig.CutConfig.CreateFinalCutString())
+            #if we have any post-fix branches to add, let's do that now
+            if TheConfig.PostfixBranchCollection != None:
+                TheConfig.PostfixBranchCollection.PrepCollection(TheChain)
+                TheConfig.BranchCollection.AddBranches(TheChain)
             #if the configuration has an end action, perform it
             if TheConfig.EndAction != None:
                 TheConfig.EndAction.PerformEndAction(TheConfig.EndAction,TheChain,TheConfig,OutputFile)
