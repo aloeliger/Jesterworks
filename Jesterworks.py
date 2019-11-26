@@ -55,7 +55,7 @@ if __name__ == "__main__":
             TheChain = TheChain.CopyTree(TheConfig.CutConfig.CreateFinalCutString())
             #if we have any post-fix branches to add, let's do that now
             try:
-                TheConfig.PostfixBranchCollection != None:
+                TheConfig.PostfixBranchCollection != None
                 TheConfig.PostfixBranchCollection.PrepCollection(TheChain)
                 TheConfig.BranchCollection.AddBranches(TheChain)
             except AttributeError:
