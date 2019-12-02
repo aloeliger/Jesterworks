@@ -57,7 +57,7 @@ if __name__ == "__main__":
             try:
                 TheConfig.PostfixBranchCollection != None
                 TheConfig.PostfixBranchCollection.PrepCollection(TheChain)
-                TheConfig.BranchCollection.AddBranches(TheChain)
+                TheConfig.PostfixBranchCollection.AddBranches(TheChain)
             except AttributeError:
                 pass
             #if the configuration has an end action, perform it
