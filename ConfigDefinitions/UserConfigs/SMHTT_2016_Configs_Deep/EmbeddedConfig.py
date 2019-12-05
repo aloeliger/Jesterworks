@@ -6,7 +6,7 @@ from ConfigDefinitions.BranchAdditions.UserDefinedCollections.EScaleCollection_2
 from ConfigDefinitions.EndActionDefinitions.UserConfigs.GrabHistograms import HistogramGrabber as HistogramGrabber
 
 EmbeddedConfig = Config()
-EmbeddedConfig.Path = '/data/ccaillol/smhmt2016_svfitted_12oct/'
+EmbeddedConfig.Path = '/data/ccaillol/smhmt2016_svfitted_20nov/'
 EmbeddedConfig.Files = ["embedded.root"]
 EmbeddedConfig.InputTreeName = 'mutau_tree'
 EmbeddedConfig.SampleName = "Embedded"

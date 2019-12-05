@@ -5,7 +5,7 @@ from ConfigDefinitions.CuttingDefinitions.UserCutConfigs.SMHTT2016Cuts_MC_wDeep 
 from ConfigDefinitions.EndActionDefinitions.UserConfigs.GrabHistograms import HistogramGrabber as HistogramGrabber
 
 DataConfig = Config()
-DataConfig.Path = "/data/ccaillol/smhmt2016_svfitted_12oct/"
+DataConfig.Path = "/data/ccaillol/smhmt2016_svfitted_20nov/"
 DataConfig.Files = ["DY.root",
                     "DY1.root",
                     "DY2.root",

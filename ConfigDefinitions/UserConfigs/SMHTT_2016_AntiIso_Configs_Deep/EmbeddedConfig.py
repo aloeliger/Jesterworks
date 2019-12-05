@@ -5,7 +5,7 @@ from ConfigDefinitions.CuttingDefinitions.UserCutConfigs.SMHTT2016Cuts_AntiIso_E
 from ConfigDefinitions.EndActionDefinitions.UserConfigs.GrabHistograms import HistogramGrabber as HistogramGrabber
 
 EmbeddedConfig = Config()
-EmbeddedConfig.Path = '/data/ccaillol/smhmt2016_svfitted_12oct/'
+EmbeddedConfig.Path = '/data/ccaillol/smhmt2016_svfitted_20nov/'
 EmbeddedConfig.Files = ["embedded.root"]
 EmbeddedConfig.InputTreeName = 'mutau_tree'
 EmbeddedConfig.SampleName = "Embedded"
