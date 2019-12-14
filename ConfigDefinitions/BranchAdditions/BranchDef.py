@@ -11,7 +11,19 @@ class UserBranch():
     def PrepareUserBranch(self,TheChain):
         self.Branch = TheChain.Branch(self.Name,self.BranchValue,self.Name+"/F")        
     def FillUserBranch(self):
-        self.Branch.Fill()
+        fillStatus = self.Branch.Fill()
+        """
+        if fillStatus == -1:
+            print "entries after bad fill: "+str(self.Branch.GetEntries())
+            print("Branch val: "+str(self.BranchValue[0]))
+            print ROOT.gDirectory.pwd()
+            self.Branch.Print()
+            #print("Retrying fill...")
+            #self.Branch.Fill()
+            #print "Entries after retried fill: "+str(self.Branch.GetEntries())
+            raise RuntimeError
+        """
+        return fillStatus
     def DefaultBranchCalcFunction(self,TheBranch,TheChain):
         raise RuntimeError("Branch: "+self.Name+" does not have a defined way to calculate it's value!")
 
@@ -23,9 +35,10 @@ class UserBranchCollection():
             DefinedBranch.PrepareUserBranch(TheChain)
     def AddBranches(self,TheChain):
         for i in range(TheChain.GetEntries()):
+            #print(i)
             TheChain.GetEntry(i)
-            for DefinedBranch in self.UserBranches:
-                DefinedBranch.CalculateValue(DefinedBranch,TheChain)
-                DefinedBranch.FillUserBranch()
+            for DefinedBranch in self.UserBranches:                
+                DefinedBranch.CalculateValue(DefinedBranch,TheChain)                
+                DefinedBranch.FillUserBranch()                
                 #DefinedBranch.Branch.Print()
     

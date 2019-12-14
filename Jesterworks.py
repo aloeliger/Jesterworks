@@ -35,14 +35,25 @@ if __name__ == "__main__":
                 os.makedirs(TheConfig.OutputPath)
                 #create the file
             OutputFile = ROOT.TFile(TheConfig.OutputPath+TheConfig.OutputFile,"RECREATE")
+            
             #get a chain and compress it into a tree
+            #if len(TheConfig.Files)>1:                
             TheChain = ROOT.TChain(TheConfig.InputTreeName)
             for File in TheConfig.ReturnCompleteListOfFiles():
                 TheChain.Add(File)
+            #print("Compressing to tree")
+            OutputFile.cd()
             TheChain = TheChain.CopyTree("")
-            #add on any extra branches we need
+            #else:                
+            #    inputFile = ROOT.TFile.Open(TheConfig.Path+TheConfig.Files[0])
+            #    TheChain = inputFile.Get(TheConfig.InputTreeName).Clone()            
+            #OutputFile.cd()
+            #TheChain.Write()
+            #exit()
             if TheConfig.BranchCollection != None:
+                #print("Prepping the collection")
                 TheConfig.BranchCollection.PrepCollection(TheChain)
+                #print("Adding the Branches")
                 TheConfig.BranchCollection.AddBranches(TheChain)
             # if we have any branch corrections to do, do them
             if TheConfig.BranchCorrections != None:
@@ -52,8 +63,11 @@ if __name__ == "__main__":
                 cutFlowHandler = CutFlowCreator()
                 cutFlowHandler.CreateCutFlow(TheConfig,TheChain)
             #this line handles all the cutting.            
+            #print("Doing cutting")
+            OutputFile.cd()
             TheChain = TheChain.CopyTree(TheConfig.CutConfig.CreateFinalCutString())
             #if we have any post-fix branches to add, let's do that now
+            #print("Doing post branches")
             try:
                 TheConfig.PostfixBranchCollection != None
                 TheConfig.PostfixBranchCollection.PrepCollection(TheChain)

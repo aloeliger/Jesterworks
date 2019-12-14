@@ -6,7 +6,7 @@ from ConfigDefinitions.BranchAdditions.UserDefinedCollections.EScaleCollection_2
 from ConfigDefinitions.EndActionDefinitions.UserConfigs.GrabHistograms import HistogramGrabber as HistogramGrabber
 
 DataConfig = Config()
-DataConfig.Path = "/data/ccaillol/smhmt2017_svfitted_12oct/"
+DataConfig.Path = "/data/ccaillol/smhmt2017_svfitted_20nov/"
 DataConfig.Files = ["ST_t_top.root"]
 DataConfig.InputTreeName = "mutau_tree"
 DataConfig.SampleName = "VV"

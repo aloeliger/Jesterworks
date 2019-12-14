@@ -74,6 +74,7 @@ def CreateMuonES_MET_UP(theBranch,theChain):
     muVector = ROOT.TLorentzVector()
     muVector.SetPtEtaPhiM(theChain.pt_1,theChain.eta_1,theChain.phi_1,theChain.m_1)
     metVector = ROOT.TLorentzVector()
+    metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
 
     if(muVector.Eta() >= -2.4 and muVector.Eta() < -2.1):
         correctedMuVector = muVector * (1.0 + 0.027)
@@ -93,6 +94,7 @@ def CreateMuonES_MET_DOWN(theBranch,theChain):
     muVector = ROOT.TLorentzVector()
     muVector.SetPtEtaPhiM(theChain.pt_1,theChain.eta_1,theChain.phi_1,theChain.m_1)
     metVector = ROOT.TLorentzVector()
+    metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
 
     if(muVector.Eta() >= -2.4 and muVector.Eta() < -2.1):
         correctedMuVector = muVector * (1.0 - 0.027)
@@ -112,6 +114,7 @@ def CreateMuonES_METPhi_UP(theBranch,theChain):
     muVector = ROOT.TLorentzVector()
     muVector.SetPtEtaPhiM(theChain.pt_1,theChain.eta_1,theChain.phi_1,theChain.m_1)
     metVector = ROOT.TLorentzVector()
+    metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
 
     if(muVector.Eta() >= -2.4 and muVector.Eta() < -2.1):
         correctedMuVector = muVector * (1.0 + 0.027)
@@ -131,6 +134,7 @@ def CreateMuonES_METPhi_DOWN(theBranch,theChain):
     muVector = ROOT.TLorentzVector()
     muVector.SetPtEtaPhiM(theChain.pt_1,theChain.eta_1,theChain.phi_1,theChain.m_1)
     metVector = ROOT.TLorentzVector()
+    metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
 
     if(muVector.Eta() >= -2.4 and muVector.Eta() < -2.1):
         correctedMuVector = muVector * (1.0 - 0.027)
