@@ -5,7 +5,7 @@ SMHTT2018Cuts.Cuts=[]
 SMHTT2018Cuts.Cuts.append("abs(eta_1)<2.1 && abs(eta_2) < 2.3")
 SMHTT2018Cuts.Cuts.append("!(Flag_goodVertices || Flag_globalSuperTightHalo2016Filter || Flag_HBHENoiseFilter || Flag_HBHENoiseIsoFilter || Flag_EcalDeadCellTriggerPrimitiveFilter || Flag_BadPFMuonFilter || Flag_eeBadScFilter || Flag_ecalBadCalibReducedMINIAODFilter)")
 SMHTT2018Cuts.Cuts.append("Trigger24 || Trigger27 || Trigger2027")
-SMHTT2018Cuts.Cuts.append("gen_match_2 != 6")#avoid overlap with FF's
+#SMHTT2018Cuts.Cuts.append("gen_match_2 != 6")#avoid overlap with FF's
 SMHTT2018Cuts.Cuts.append("byVVVLooseDeepVSe_2 && byTightDeepVSmu_2")
 SMHTT2018Cuts.Cuts.append("DeltaR > 0.5")
 SMHTT2018Cuts.Cuts.append("nbtag <= 0 && nbtagL <= 1")
