@@ -6,7 +6,7 @@ from ConfigDefinitions.CuttingDefinitions.UserCutConfigs.SMHTT2016Cuts_AntiIso_M
 from ConfigDefinitions.EndActionDefinitions.UserConfigs.GrabHistograms import HistogramGrabber as HistogramGrabber
 
 DataConfig = Config()
-DataConfig.Path = "/data/ccaillol/smhmt2016_svfitted_20nov/"
+DataConfig.Path = "/data/ccaillol/smhmt2016_svfitted_23feb/"
 DataConfig.Files = ["WminusHWW.root"]
 DataConfig.InputTreeName = "mutau_tree"
 DataConfig.SampleName = "WminusHWW"

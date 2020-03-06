@@ -6,7 +6,7 @@ from ConfigDefinitions.CuttingDefinitions.UserCutConfigs.SMHTT2016Cuts_MC_NoEmbe
 from ConfigDefinitions.EndActionDefinitions.UserConfigs.GrabHistograms import HistogramGrabber as HistogramGrabber
 
 DataConfig = Config()
-DataConfig.Path = "/data/ccaillol/smhmt2016_svfitted_20nov/"
+DataConfig.Path = "/data/ccaillol/smhmt2016_svfitted_23feb/"
 DataConfig.Files = ["ST_tW_top.root"]
 DataConfig.InputTreeName = "mutau_tree"
 DataConfig.SampleName = "ST_tW_top"

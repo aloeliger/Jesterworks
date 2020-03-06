@@ -5,7 +5,7 @@ from ConfigDefinitions.CuttingDefinitions.UserCutConfigs.SMHTT2018Cuts_Embedded_
 from ConfigDefinitions.EndActionDefinitions.UserConfigs.GrabHistograms import HistogramGrabber as HistogramGrabber
 
 DataConfig = Config()
-DataConfig.Path = "/data/ccaillol/smhmt2018_svfitted_20nov/"
+DataConfig.Path = "/data/ccaillol/smhmt2018_svfitted_2mar/"
 DataConfig.Files = ["Embedded.root"]
 DataConfig.InputTreeName = "mutau_tree"
 DataConfig.SampleName = "Embedded"
