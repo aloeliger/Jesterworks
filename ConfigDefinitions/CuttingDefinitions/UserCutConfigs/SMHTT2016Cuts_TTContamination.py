@@ -6,7 +6,7 @@ SMHTT2016Cuts.Cuts = []
 SMHTT2016Cuts.Cuts.append("abs(eta_1)<2.1 && abs(eta_2)<2.3") #agree
 SMHTT2016Cuts.Cuts.append("!(Flag_goodVertices || Flag_globalSuperTightHalo2016Filter || Flag_HBHENoiseIsoFilter || Flag_HBHENoiseFilter || Flag_EcalDeadCellTriggerPrimitiveFilter || Flag_BadPFMuonFilter)") #agree
 SMHTT2016Cuts.Cuts.append("Trigger22 || Trigger1920") # agree
-SMHTT2016Cuts.Cuts.append("byVVVLooseDeepVSe_2 && byTightDeepVSmu_2") #agree
+SMHTT2016Cuts.Cuts.append("byVLooseDeepVSe_2 && byTightDeepVSmu_2") #agree
 SMHTT2016Cuts.Cuts.append("DeltaR > 0.5")
 SMHTT2016Cuts.Cuts.append("nbtag <= 0 && nbtagL <= 1") #agree
 SMHTT2016Cuts.Cuts.append("pt_1 > 20.0 && pt_2 > 20.0")
