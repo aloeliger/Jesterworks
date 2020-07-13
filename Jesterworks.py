@@ -73,7 +73,8 @@ if __name__ == "__main__":
                 TheConfig.PostfixBranchCollection.PrepCollection(TheChain)
                 TheConfig.PostfixBranchCollection.AddBranches(TheChain)
             except AttributeError:
-                pass
+                print "Postfix creation error!"
+                traceback.print_exc()
             #if the configuration has an end action, perform it
             if TheConfig.EndAction != None:
                 TheConfig.EndAction.PerformEndAction(TheConfig.EndAction,TheChain,TheConfig,OutputFile)
