@@ -7,7 +7,7 @@ SMHTT2018Cuts.Cuts.append("!(Flag_goodVertices || Flag_globalSuperTightHalo2016F
 SMHTT2018Cuts.Cuts.append("Trigger24 || Trigger27 || Trigger2027")
 SMHTT2018Cuts.Cuts.append("byVLooseDeepVSe_2 && byTightDeepVSmu_2")
 SMHTT2018Cuts.Cuts.append("DeltaR > 0.5")
-SMHTT2018Cuts.Cuts.append("nbtag <= 0 && nbtagL <= 1")
+#SMHTT2018Cuts.Cuts.append("nbtag <= 0 && nbtagL <= 1")
 SMHTT2018Cuts.Cuts.append("pt_2 > 20")
 SMHTT2018Cuts.Cuts.append("gen_match_2 != 6") #don't overlap with fake factors
 SMHTT2018Cuts.Cuts.append("q_1 * q_2 < 0")

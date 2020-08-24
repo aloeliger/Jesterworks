@@ -6,7 +6,7 @@ from ConfigDefinitions.CuttingDefinitions.UserCutConfigs.SMHTT2016Cuts_MC_wDeep 
 from ConfigDefinitions.EndActionDefinitions.UserConfigs.GrabHistograms import HistogramGrabber as HistogramGrabber
 
 DataConfig = Config()
-DataConfig.Path = "/data/ccaillol/smhmt2016_svfitted_23feb/"
+DataConfig.Path = "/data/ccaillol/differentialmt2016_svfitted_3aug/"
 DataConfig.Files = ["WZ2L2Q.root"]
 DataConfig.InputTreeName = "mutau_tree"
 DataConfig.SampleName = "WZ2L2Q"
