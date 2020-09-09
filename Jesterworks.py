@@ -13,6 +13,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Jesterworks rnning script for skimming and selecting from root trees")
     parser.add_argument("--ConfigFiles",nargs="+",help="Python based configurations files used to specify output",required=True)
     parser.add_argument("--CreateCutFlow",help="Create a cutflow histogram for the file and store it",action="store_true")
+    parser.add_argument('--runSpecificFiles',help='Run a specific file index from the files list in the configuration',nargs='+',default=None,type=int)
 
     args = parser.parse_args()
 
@@ -34,13 +35,25 @@ if __name__ == "__main__":
             if not os.path.isdir(TheConfig.OutputPath):
                 os.makedirs(TheConfig.OutputPath)
                 #create the file
-            OutputFile = ROOT.TFile(TheConfig.OutputPath+TheConfig.OutputFile,"RECREATE")
+            #if we're running on specific files, let's make a note of which files have been reequested
+            #then we can insert the indexes into the file name so we can retrieve them later
+            if args.runSpecificFiles != None:
+                
+                finalName = TheConfig.OutputPath+TheConfig.OutputFile.replace('.root',''.join('_'+str(fileNum) for fileNum in args.runSpecificFiles)+'.root')
+            else:
+                OutputFile = ROOT.TFile(TheConfig.OutputPath+TheConfig.OutputFile,"RECREATE")
             
             #get a chain and compress it into a tree
             #if len(TheConfig.Files)>1:                
             TheChain = ROOT.TChain(TheConfig.InputTreeName)
-            for File in TheConfig.ReturnCompleteListOfFiles():
-                TheChain.Add(File)
+            if args.runSpecificFiles == None:
+                for File in TheConfig.ReturnCompleteListOfFiles():
+                    TheChain.Add(File)
+            else:
+                fileList = TheConfig.ReturnCompleteListOfFiles():
+                for fileIndex in args.runSpecificFiles:
+                    TheChain.Add(fileList[fileIndex])
+                    
             #print("Compressing to tree")
             OutputFile.cd()
             TheChain = TheChain.CopyTree("")
