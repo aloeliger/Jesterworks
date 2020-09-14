@@ -4,7 +4,7 @@
 
 import os
 import argparse
-from JesterworksUtils.RecursiveLoader
+from Jesterworks.JesterworksUtils.RecursiveLoader import RecursiveLoader
 from ConfigDefinitions.JesterworksConfigurations import JesterworksConfiguration as JesterworksConfiguration
 import datetime
 import getpass    
@@ -53,7 +53,7 @@ def main():
         os.system('voms-proxy-init --voms=\"cms\" --valid=192:00')
     
     #now that we have that, let's loop over each of our configurations
-    theLoader = JesterworksUtils.RecursiveLoader.RecursiveLoader()
+    theLoader = RecursiveLoader()
     for configFile in args.configFiles:
         #let's quickly load the module
         theConfigModule = theLoader.LoadFromDirectoryPath(configFile)
@@ -63,7 +63,7 @@ def main():
                 break
         #okay, let's set up a submission directory if that doesn't exist
         configFileDirectoryName = configFile[configFile.rfind('/')+1:len(configFile)-3]+datetime/datetime.now().strftime('%d%m%y_%H%M')
-        overallSubmissionDirectory = '/nfs_scratch/'+getpass.getuser()='/'+configFileDirectoryName
+        overallSubmissionDirectory = '/nfs_scratch/'+getpass.getuser()+'/'+configFileDirectoryName
         if not os.path.isdir(overallSubmissionDirectory):
             os.mkdir(overallSubmissionDirectory)
         #okay, at this point, let's consider whether we are doing this for all files of a configuration, or whether

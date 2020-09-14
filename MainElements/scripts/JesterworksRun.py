@@ -1,10 +1,11 @@
+#!/usr/bin/env python
 #Main jesterworks run script
 import ROOT
-import JesterworksUtils.RecursiveLoader
-import JesterworksUtils.Colors as Colors
-from JesterworksUtils.CutFlowCreator import CutFlowCreator
+import Jesterworks.JesterworksUtils.RecursiveLoader
+import Jesterworks.JesterworksUtils.Colors as Colors
+from Jesterworks.JesterworksUtils.CutFlowCreator import CutFlowCreator
 import argparse
-from ConfigDefinitions.JesterworksConfigurations import JesterworksConfiguration as JesterworksConfiguration
+from Jesterworks.ConfigDefinitions.JesterworksConfigurations import JesterworksConfiguration as JesterworksConfiguration
 import sys
 import os
 import traceback

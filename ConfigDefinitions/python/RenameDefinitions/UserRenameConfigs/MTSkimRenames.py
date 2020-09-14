@@ -23,7 +23,7 @@ MTSkimRenaming.Renames = {
     "genM":"gen_Higgs_mass",
     "topQuarkPt1":"pt_top1",
     "topQuarkPt2":"pt_top2",
-    "jetVeto30":"njets"
+    "jetVeto30":"njets",
     "bjetDeepCSVVeto20Medium_2016_DR0p5":"nbtag",
     "bjetDeepCSVVeto20Loose_2016_DR0p5":"nbtagL",
     "jetVeto30_JetRelativeSampleUp":"njets_JetRelativeSampleUp",
