@@ -13,31 +13,64 @@ import re
 
 #create a submission file for use on condor
 #do it at the specified location.
-def createSubmissionFile(fileName):
+
+def getSimpleCommandOutput(command):
+    theCommand = [command]
+    theProcess = subprocess.Popen(
+        theCommand,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        )
+    output,error = theProcess.communicate()
+    theExitCode = theProcess.wait()
+    
+    if theExistCode != 0:
+        raise RuntimeError('Non zero exit code of basic command: '+command+'\n'+output+'\n'+error)
+    return output,error
+
+def createSubmissionFile(initialDir,fileName,configFileName,fileIndex):
     #let's create the submission file at the specified location
     #this should be an explicit creation of the file
     theFile = open(fileName,'x')
     #we need to make sure we know where our proxy is.
     #this will have information specific to user, so we have no choice really
-    #except parsing some information and figuring it out ourself
-    vomsProxyInfoCommand = ['voms-proxy-info']
-    vomsProxyInfoProcess = subprocess.Popen(
-        vomsProxyInfoCommand,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    vomsProxyInfoOut, vomsProxyInfoErr = vomsProxyInfoProcess.communicate()
-    vomsProxyInfoExitcode = vomsProxyInfoProcess.wait()
-
-    if vomsProxyInfoExitcode <> 0:
-        raise RuntimeError(
-            'voms proxy info error: %s' % vomsProxyInfoOut+vomsProxyInfoErr
-            )
-    #okay, now let's find the location and name of the voms proxy
-    proxyFileLocation = re.search('(?:path\s+:\s)(/.*)*',vomsProxyInfoOut).group(1)
-    theFile.Write('X509UserProxy        = '+proxyFileLocation+'\n')
     
+    
+    #okay, now let's find the location and name of the voms proxy
+    vomsProxyInfoOut,vomsProxyInfoErr = getSimpleCommandOutput('voms-proxy-info')
+    proxyFileLocation = re.search('(?:path\s+:\s)(/.*)*',vomsProxyInfoOut).group(1)
+    theFile.write('X509UserProxy        = '+proxyFileLocation+'\n')
 
+    #write out the initial dir for the submission
+    theFile.write('InitialDir           = '+initialDir)
+    
+    #find the location of the jesterworks executable script
+    jesterworksLocationOut,jesterworksLocationErr = getSimpleCommandOutput('which Jesterworks.py')    
+    theFile.write('Executable           = '+jesterworksLocationOut)#assumes natively (i.e. no python call) runnable jesterworks script
+    
+    #jesterworks arguments
+    theFile.write('Arguments            = "--ConfigFile '+configFileName+' --runSpecificFiles '+str(fileIndex)+']\n')
+
+    #let's just do some output logging filing stuff
+    outputFileName = fileName[:fileName.find('.')]+'.out'
+    theFile.write('output               = '+outputFileName+'\n')
+
+    errFileName = fileName[:fileName.find('.')]+'.err'
+    theFile.write('error                = '+errFileName+'\n')
+
+    logFileName = fileName[:fileName.find('.')]+'.log'
+    theFile.write('Log                  = '+logFileName+'\n')
+    
+    #let's just handle some standard memory, disk and cpu request stuff
+    #we can add special options for any of these later if we decide we want to change these.
+    theFile.write('request_memory       = 3000'+'\n')
+    theFile.write('request_disk         = 2048000'+'\n')
+    theFile.write('request_cpus         = 1'+'\n')
+    theFile.write('WhenToTransferOutput = On_Exit')
+
+    #this is the final submission command necessary
+    theFile.write('queue')
+    
 def main():    
     parser = argparse.ArgumentParser(description='Jesterworks submission tool for running configurations or parts of configurations on condor')
     parser.add_argument('--configFiles','-c',nargs='+',help='configurations to create submissions for',required=True)
@@ -76,12 +109,11 @@ def main():
         for fileIndex in indicesToProcess:
             #let's set up a directory specifically for whichever file it is we want to submit
             fileNumSpecificName = overallSubmissionDirectory+'/'+configFileDirectoryName+''
-            if not os.path.isdir(overallSubmissionDirectory):
-                os.mkdir(fileNumSpecificName)
+            if not os.path.isdir(fileNumSpecificName):
+                os.mkdir(fileNumSpecificName,)
                 
             #okay, our next job is to go ahead and make a submission file for this specific file we want to submit.
             
-    
-
+            createSubmissionFile(fileNumSpecificName,configFileDirectoryName+'.sub',configFile,fileIndex)
 if __name__ == '__main__':
     main()
