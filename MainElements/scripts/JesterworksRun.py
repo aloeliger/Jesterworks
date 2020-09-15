@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #Main jesterworks run script
 import ROOT
-import Jesterworks.JesterworksUtils.RecursiveLoader
+from Jesterworks.JesterworksUtils.RecursiveLoader import RecursiveLoader
 import Jesterworks.JesterworksUtils.Colors as Colors
 from Jesterworks.JesterworksUtils.CutFlowCreator import CutFlowCreator
 import argparse
@@ -18,11 +18,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    TheLoader = JesterworksUtils.RecursiveLoader.RecursiveLoader()
+    TheLoader = RecursiveLoader()
     NumErrors = 0
     for ConfigFile in args.ConfigFiles: 
         try:
-            TheConfigModule = TheLoader.LoadFromDirectoryPath(ConfigFile)
+            TheConfigModule = TheLoader.LoadFromCMSSWPath(ConfigFile)
             sys.stdout.write(Colors.BLUE+"[>>Processing<<]"+Colors.ENDC+" "+ConfigFile+"\r")
             sys.stdout.flush()
             #scan the contents of the module looking for an
@@ -39,8 +39,9 @@ if __name__ == "__main__":
             #if we're running on specific files, let's make a note of which files have been reequested
             #then we can insert the indexes into the file name so we can retrieve them later
             if args.runSpecificFiles != None:
-                
+
                 finalName = TheConfig.OutputPath+TheConfig.OutputFile.replace('.root',''.join('_'+str(fileNum) for fileNum in args.runSpecificFiles)+'.root')
+                OutputFile = ROOT.TFile(finalName,"RECREATE")
             else:
                 OutputFile = ROOT.TFile(TheConfig.OutputPath+TheConfig.OutputFile,"RECREATE")
             
@@ -51,7 +52,7 @@ if __name__ == "__main__":
                 for File in TheConfig.ReturnCompleteListOfFiles():
                     TheChain.Add(File)
             else:
-                fileList = TheConfig.ReturnCompleteListOfFiles():
+                fileList = TheConfig.ReturnCompleteListOfFiles()
                 for fileIndex in args.runSpecificFiles:
                     TheChain.Add(fileList[fileIndex])
                     

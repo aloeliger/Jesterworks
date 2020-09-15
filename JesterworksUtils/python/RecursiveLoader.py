@@ -1,4 +1,4 @@
-#a quick class used for lloading other modules in the package in a convenient way
+#a quick class used for loading other modules in the package in a convenient way
 
 class RecursiveLoader():
     def __init__(self):
@@ -17,3 +17,14 @@ class RecursiveLoader():
         PathToLoad=PathToLoad[:len(PathToLoad)-3]
         PathToLoad=PathToLoad.replace("/",".")        
         return self.LoadPath(PathToLoad)
+        
+    def LoadFromCMSSWPath(self,pathToLoad):
+        #okay, let's get rid of any explicit mentions of "python" in the path to load
+        print pathToLoad
+        if 'python/' in pathToLoad:
+            pathToLoad = pathToLoad.replace('python/','')
+        #let's also add on the overall module name so we can load this from a CMSSW
+        if not 'Jesterworks/' in pathToLoad:
+            pathToLoad = 'Jesterworks/'+pathToLoad            
+        print pathToLoad
+        return self.LoadFromDirectoryPath(pathToLoad)
