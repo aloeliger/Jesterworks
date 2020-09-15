@@ -1,6 +1,6 @@
 #sample cuts to run a NANOAOD file under
 
-from ConfigDefinitions.CuttingDefinitions.CutDef import UserCutConfig as CutConfig
+from Jesterworks.ConfigDefinitions.CuttingDefinitions.CutDef import UserCutConfig as CutConfig
 
 sampleCuts = CutConfig()
 sampleCuts.Cuts = []

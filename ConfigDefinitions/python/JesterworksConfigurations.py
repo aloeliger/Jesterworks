@@ -2,12 +2,12 @@
 # this will be used as a common template for user based inheritances
 import ROOT
 import glob
-import ConfigDefinitions.BranchAdditions.BranchDef as BranchDef
-import ConfigDefinitions.CuttingDefinitions.CutDef as CutDef
-import ConfigDefinitions.GlobalsDefinition.GlobalsDef as GlobalsDef
-import ConfigDefinitions.EndActionDefinitions.EndActionDef as EndActionDef
-import ConfigDefinitions.RenameDefinitions.RenameDef as RenameDef
-import ConfigDefinitions.BranchCorrections.BranchCorrection as BranchCorrection
+import Jesterworks.ConfigDefinitions.BranchAdditions.BranchDef as BranchDef
+import Jesterworks.ConfigDefinitions.CuttingDefinitions.CutDef as CutDef
+#import Jesterworks.ConfigDefinitions.GlobalsDefinition.GlobalsDef as GlobalsDef
+import Jesterworks.ConfigDefinitions.EndActionDefinitions.EndActionDef as EndActionDef
+import Jesterworks.ConfigDefinitions.RenameDefinitions.RenameDef as RenameDef
+import Jesterworks.ConfigDefinitions.BranchCorrections.BranchCorrection as BranchCorrection
 
 class JesterworksConfiguration():
     def __init__(self):

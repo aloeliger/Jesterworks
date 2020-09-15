@@ -1,7 +1,7 @@
 #just a basic configuration to see if the nanoAOD files will take basic editing from jesterworks without extensive modifications
 
-from ConfigDefinitions.JesterworksConfigurations import JesterworksConfiguration as Config
-from ConfigDefinitions.CuttingDefinitions.UserCutConfigs.NanoAODTesting.sampleNanoAODCuts import sampleCuts as cutConfig
+from Jesterworks.ConfigDefinitions.JesterworksConfigurations import JesterworksConfiguration as Config
+from Jesterworks.ConfigDefinitions.CuttingDefinitions.UserCutConfigs.NanoAODTesting.sampleNanoAODCuts import sampleCuts as cutConfig
 
 DataConfig = Config()
 DataConfig.Path = 'root://cmsxrootd.fnal.gov//'
