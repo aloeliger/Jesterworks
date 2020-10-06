@@ -12,6 +12,7 @@ SMHTT2016Cuts.Cuts.append("!(gen_match_1 > 2 && gen_match_1 < 6 && gen_match_2 >
 SMHTT2016Cuts.Cuts.append("byVLooseDeepVSe_2 && byTightDeepVSmu_2")
 #SMHTT2016Cuts.Cuts.append("byVLooseDeepVSe_2 && byTightDeepVSmu_2")
 SMHTT2016Cuts.Cuts.append("DeltaR > 0.5")
-#SMHTT2016Cuts.Cuts.append("nbtag <= 0 && nbtagL <= 1")
+##SMHTT2016Cuts.Cuts.append("nbtag <= 0 && nbtagL <= 1")
+SMHTT2016Cuts.Cuts.append("nbtag <= 0")
 SMHTT2016Cuts.Cuts.append("q_1 * q_2 < 0")
 SMHTT2016Cuts.Cuts.append("byMediumDeepVSjet_2 && iso_1 < 0.15")
