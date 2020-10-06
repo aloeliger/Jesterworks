@@ -14,5 +14,6 @@ DataConfig.OutputPath = "/data/aloeliger/SMHTT_Selected_2017_AntiIso_Deep/"
 DataConfig.OutputFile = "ZH.root"
 DataConfig.OutputTreeName = 'mt_Selected'
 DataConfig.BranchCollection = BranchCollection
+DataConfig.PostfixBranchCollection = PostfixCollection
 DataConfig.CutConfig = CutConfig
 DataConfig.EndAction = HistogramGrabber
