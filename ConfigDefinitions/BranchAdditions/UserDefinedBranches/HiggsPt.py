@@ -10,7 +10,7 @@ def CalculateHiggsPt(theBranch,theChain):
     tauVector.SetPtEtaPhiM(theChain.pt_2,theChain.eta_2,theChain.phi_2,theChain.m_2)
     metVector.SetPtEtaPhiM(theChain.met,0.0,theChain.metphi,0.0)
 
-    theBranch.BranchValue[0] = (muVector + tauVector + metVector).Pt() * 1.05 #1.05 factor made with measurements compared to rivet higgs pt.
+    theBranch.BranchValue[0] = (muVector + tauVector + metVector).Pt()
 
 HiggsPtBranch = Branch.UserBranch()
 HiggsPtBranch.Name = "HiggsPt"
