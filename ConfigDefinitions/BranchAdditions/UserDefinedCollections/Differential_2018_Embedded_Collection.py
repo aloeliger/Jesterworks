@@ -13,6 +13,7 @@ import ConfigDefinitions.BranchAdditions.UserDefinedBranches.VisibleEta as Visib
 import ConfigDefinitions.BranchAdditions.UserDefinedBranches.VisiblePhi as VisiblePhi
 import ConfigDefinitions.BranchAdditions.UserDefinedBranches.VisiblePt as VisiblePt
 import ConfigDefinitions.BranchAdditions.UserDefinedBranches.MTBranch as MTBranch
+import ConfigDefinitions.BranchAdditions.UserDefinedBranches.DifferentialHiggsPt as DifferentialHiggsPt
 
 DifferentialCollection = BranchDef.UserBranchCollection()
 DifferentialCollection.UserBranches = [
@@ -59,4 +60,5 @@ DifferentialCollection.UserBranches = [
     VisiblePhi.VisiblePhiBranch,
     VisiblePt.VisiblePtBranch,
     MTBranch.MTBranch,
+    DifferentialHiggsPt.differentialHiggsPtBranch,
 ]
